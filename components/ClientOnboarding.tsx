@@ -482,24 +482,34 @@ export default function ClientOnboarding() {
 
           <section className={cardClass}>
             <div className="mb-8">
-              <h2 className={sectionTitleClass}>Features Required</h2>
+              <h2 className={sectionTitleClass}>Key Features Needed</h2>
               <p className={`mt-1.5 text-sm ${helperClass}`}>
-                Select everything that applies, then add anything missing below.
+                Select the features you need. Add anything custom below.
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-3">
               {[
                 "Login / Signup",
+                "User Profiles",
                 "Dashboard",
+                "Search & Filters",
                 "Payments",
                 "Booking System",
-                "Analytics",
-                "Admin Panel",
-                "Chat",
+                "Reviews & Ratings",
+                "Wishlist / Favorites",
+                "Chat / Messaging",
                 "Notifications",
-                "Dark Mode",
+                "Email Alerts",
+                "File Uploads",
+                "Admin Panel",
+                "Analytics & Reports",
+                "Calendar Integration",
+                "Maps / Location",
                 "Multi Language",
+                "Dark Mode",
+                "AI Features",
+                "Social Sharing",
               ].map((item) => (
                 <label key={item} className={checkboxLabelClass}>
                   <input type="checkbox" name="features" value={item} className="h-4 w-4" />
