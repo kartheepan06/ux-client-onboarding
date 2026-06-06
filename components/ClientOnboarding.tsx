@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 
 type FieldErrors = {
   name?: string;
@@ -19,6 +25,26 @@ export default function ClientOnboarding() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [projectType, setProjectType] = useState("");
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const submitRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const scrollToSubmit = () => {
+    submitRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  const fabClass =
+    "flex h-12 w-12 items-center justify-center rounded-full bg-[#1A73E8] text-white text-xl leading-none shadow-lg transition-all duration-200 hover:bg-[#1967D2] hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-[#1A73E8]/30";
 
   const pageClass = darkMode
     ? "bg-zinc-950 text-white"
@@ -60,9 +86,8 @@ export default function ClientOnboarding() {
     ? "flex items-center gap-3 border border-zinc-800 rounded-2xl px-4 py-3.5 text-sm cursor-pointer transition hover:border-zinc-600 hover:bg-zinc-800/40"
     : "flex items-center gap-3 border border-zinc-200 rounded-2xl px-4 py-3.5 text-sm cursor-pointer transition hover:border-zinc-300 hover:bg-zinc-50";
 
-  const buttonClass = darkMode
-    ? "inline-flex items-center justify-center w-full sm:w-auto px-12 py-4 text-base font-semibold rounded-full transition-all duration-200 bg-white text-zinc-900 shadow-sm hover:bg-zinc-100 hover:shadow-[0_16px_44px_-14px_rgba(255,255,255,0.3)] hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-white/25 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-sm"
-    : "inline-flex items-center justify-center w-full sm:w-auto px-12 py-4 text-base font-semibold rounded-full transition-all duration-200 bg-zinc-900 text-white shadow-sm hover:bg-zinc-800 hover:shadow-[0_16px_44px_-14px_rgba(0,0,0,0.45)] hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-zinc-900/15 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-sm";
+  const buttonClass =
+    "inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 text-base font-medium rounded-full transition-all duration-200 bg-[#1A73E8] text-white shadow-sm hover:bg-[#1967D2] hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-[#1A73E8]/30 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-sm";
 
   const themeToggle = (
     <button
@@ -635,7 +660,7 @@ export default function ClientOnboarding() {
             </div>
           </section>
 
-          <div className="pt-2">
+          <div ref={submitRef} className="pt-2">
             {error && (
               <p
                 className={`mb-4 text-sm font-medium ${
@@ -669,6 +694,28 @@ export default function ClientOnboarding() {
             </p>
           </div>
         </form>
+      </div>
+
+      <div className="fixed right-5 bottom-5 sm:right-6 sm:bottom-6 z-50 flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={scrollToSubmit}
+          aria-label="Scroll to submit section"
+          className={fabClass}
+        >
+          <span aria-hidden="true">↓</span>
+        </button>
+
+        {showScrollTop && (
+          <button
+            type="button"
+            onClick={scrollToTop}
+            aria-label="Scroll to top"
+            className={fabClass}
+          >
+            <span aria-hidden="true">↑</span>
+          </button>
+        )}
       </div>
     </div>
   );
