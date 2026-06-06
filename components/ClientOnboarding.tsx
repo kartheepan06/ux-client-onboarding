@@ -231,10 +231,13 @@ export default function ClientOnboarding() {
   return (
     <div className={`min-h-screen ${pageClass}`}>
       <div className="max-w-5xl mx-auto px-6 py-14 md:py-24">
-        <div className="flex justify-between items-center mb-14">
-          <p className="text-sm font-medium tracking-wide text-zinc-500">
-            UX/UI Client Onboarding
-          </p>
+        <div className="flex justify-between items-start gap-4 mb-14">
+          <div>
+            <p className="text-lg font-semibold tracking-tight">Kartheepan</p>
+            <p className="mt-1 text-sm tracking-wide text-zinc-500">
+              UX/UI Designer • Product Design • User Experience
+            </p>
+          </div>
 
           {themeToggle}
         </div>
@@ -247,8 +250,9 @@ export default function ClientOnboarding() {
           <p
             className={`mt-6 text-lg md:text-2xl leading-relaxed font-light ${helperClass}`}
           >
-            Share your goals, vision, and project requirements so we can create
-            the best possible experience together.
+            Share your goals, vision, and project requirements. This onboarding
+            portal helps create a structured discovery process before design
+            begins.
           </p>
         </div>
 
@@ -694,6 +698,26 @@ export default function ClientOnboarding() {
             </p>
           </div>
         </form>
+
+        <footer
+          className={`mt-16 pt-8 text-center border-t ${
+            darkMode ? "border-zinc-800" : "border-zinc-200"
+          }`}
+        >
+          <p className={`text-sm ${helperClass}`}>Questions?</p>
+          <p className={`mt-1 text-sm ${helperClass}`}>
+            Have a question before getting started? Feel free to reach out.
+          </p>
+          <a
+            href="mailto:kartheepanmu6@gmail.com"
+            className="mt-3 inline-block text-sm font-medium text-[#1A73E8] hover:text-[#1967D2] transition"
+          >
+            Send an email
+          </a>
+          <p className={`mt-4 text-xs ${helperClass}`}>
+            Thank you for taking the time to complete this onboarding form.
+          </p>
+        </footer>
       </div>
 
       <div className="fixed right-5 bottom-5 sm:right-6 sm:bottom-6 z-50 flex flex-col gap-3">
