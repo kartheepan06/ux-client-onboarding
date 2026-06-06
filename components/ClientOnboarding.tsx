@@ -16,6 +16,68 @@ type FieldErrors = {
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Desktop order is preserved exactly as before.
+const FEATURES = [
+  "Login / Signup",
+  "User Profiles",
+  "Dashboard",
+  "Search & Filters",
+  "Payments",
+  "Booking System",
+  "Reviews & Ratings",
+  "Wishlist / Favorites",
+  "Chat / Messaging",
+  "Notifications",
+  "Email Alerts",
+  "File Uploads",
+  "Admin Panel",
+  "Analytics & Reports",
+  "Calendar Integration",
+  "Maps / Location",
+  "Multi Language",
+  "Dark Mode",
+  "AI Features",
+  "Social Sharing",
+] as const;
+
+// Same feature values, grouped for the mobile accordion. Every item below
+// also exists in FEATURES, so selections and Formspree values stay identical
+// across desktop and mobile.
+const FEATURE_GROUPS: { title: string; items: string[] }[] = [
+  {
+    title: "Core Features",
+    items: ["Login / Signup", "User Profiles", "Dashboard", "Search & Filters"],
+  },
+  {
+    title: "Business Features",
+    items: [
+      "Payments",
+      "Booking System",
+      "Reviews & Ratings",
+      "Wishlist / Favorites",
+    ],
+  },
+  {
+    title: "Communication",
+    items: ["Chat / Messaging", "Notifications", "Email Alerts", "Multi Language"],
+  },
+  {
+    title: "Admin & Analytics",
+    items: ["Analytics & Reports", "Admin Panel"],
+  },
+  {
+    title: "Additional Features",
+    items: [
+      "File Uploads",
+      "Calendar Integration",
+      "Maps / Location",
+      "Dark Mode",
+      "AI Features",
+      "Social Sharing",
+    ],
+  },
+];
+
 export default function ClientOnboarding() {
   const [darkMode, setDarkMode] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -26,6 +88,14 @@ export default function ClientOnboarding() {
   const [email, setEmail] = useState("");
   const [projectType, setProjectType] = useState("");
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [featuresOpen, setFeaturesOpen] = useState(false);
+
+  const toggleFeature = (item: string) => {
+    setSelectedFeatures((prev) =>
+      prev.includes(item) ? prev.filter((f) => f !== item) : [...prev, item]
+    );
+  };
   const submitRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -85,6 +155,10 @@ export default function ClientOnboarding() {
   const checkboxLabelClass = darkMode
     ? "flex items-center gap-3 border border-zinc-800 rounded-2xl px-4 py-3.5 text-sm cursor-pointer transition hover:border-zinc-600 hover:bg-zinc-800/40"
     : "flex items-center gap-3 border border-zinc-200 rounded-2xl px-4 py-3.5 text-sm cursor-pointer transition hover:border-zinc-300 hover:bg-zinc-50";
+
+  const chipClass = darkMode
+    ? "inline-flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-900 pl-3 pr-2 py-1.5 text-sm text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-800"
+    : "inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white pl-3 pr-2 py-1.5 text-sm text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50";
 
   const buttonClass =
     "inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 text-base font-medium rounded-full transition-all duration-200 bg-[#1A73E8] text-white shadow-sm hover:bg-[#1967D2] hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-[#1A73E8]/30 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-sm";
@@ -517,35 +591,121 @@ export default function ClientOnboarding() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-3">
-              {[
-                "Login / Signup",
-                "User Profiles",
-                "Dashboard",
-                "Search & Filters",
-                "Payments",
-                "Booking System",
-                "Reviews & Ratings",
-                "Wishlist / Favorites",
-                "Chat / Messaging",
-                "Notifications",
-                "Email Alerts",
-                "File Uploads",
-                "Admin Panel",
-                "Analytics & Reports",
-                "Calendar Integration",
-                "Maps / Location",
-                "Multi Language",
-                "Dark Mode",
-                "AI Features",
-                "Social Sharing",
-              ].map((item) => (
+            {/* DESKTOP (md and up): existing 2-column grid, unchanged */}
+            <div className="hidden md:grid md:grid-cols-2 gap-3">
+              {FEATURES.map((item) => (
                 <label key={item} className={checkboxLabelClass}>
-                  <input type="checkbox" name="features" value={item} className="h-4 w-4" />
+                  <input
+                    type="checkbox"
+                    checked={selectedFeatures.includes(item)}
+                    onChange={() => toggleFeature(item)}
+                    className="h-4 w-4"
+                  />
                   {item}
                 </label>
               ))}
             </div>
+
+            {/* MOBILE (below md): collapsible accordion picker */}
+            <div className="md:hidden">
+              <button
+                type="button"
+                onClick={() => setFeaturesOpen((open) => !open)}
+                aria-expanded={featuresOpen}
+                aria-controls="features-accordion"
+                className={`flex w-full items-center justify-between text-left ${inputClass}`}
+              >
+                <span className={featuresOpen ? "" : helperClass}>
+                  {featuresOpen
+                    ? "Choose Features"
+                    : `${selectedFeatures.length} feature${
+                        selectedFeatures.length === 1 ? "" : "s"
+                      } selected`}
+                </span>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  className={`shrink-0 transition-transform duration-200 ${
+                    featuresOpen ? "rotate-180" : ""
+                  } ${helperClass}`}
+                >
+                  <path
+                    d="M5.5 7.5L10 12l4.5-4.5"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+
+              <div
+                id="features-accordion"
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  featuresOpen
+                    ? "max-h-[2000px] opacity-100 mt-4"
+                    : "max-h-0 opacity-0"
+                }`}
+              >
+                {FEATURE_GROUPS.map((group) => (
+                  <div key={group.title} className="mb-5">
+                    <p
+                      className={`mb-2 text-xs font-semibold uppercase tracking-wide ${helperClass}`}
+                    >
+                      {group.title}
+                    </p>
+                    <div className="grid gap-3">
+                      {group.items.map((item) => (
+                        <label key={item} className={checkboxLabelClass}>
+                          <input
+                            type="checkbox"
+                            checked={selectedFeatures.includes(item)}
+                            onChange={() => toggleFeature(item)}
+                            className="h-4 w-4"
+                          />
+                          {item}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Selected feature chips (both layouts) */}
+            {selectedFeatures.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {selectedFeatures.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => toggleFeature(item)}
+                    aria-label={`Remove ${item}`}
+                    className={chipClass}
+                  >
+                    {item}
+                    <span aria-hidden="true" className="text-base leading-none">
+                      ×
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Hidden inputs are what actually submit to Formspree, rendered
+                once from state so values are never duplicated across layouts. */}
+            {selectedFeatures.map((item) => (
+              <input
+                key={item}
+                type="hidden"
+                name="features"
+                value={item}
+              />
+            ))}
 
             <div className="mt-6">
               <label htmlFor="other_features" className={labelClass}>
