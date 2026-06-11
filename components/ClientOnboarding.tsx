@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ChangeEvent,
@@ -113,8 +115,100 @@ export default function ClientOnboarding() {
   /* submitted data for success screen */
   const [submittedData, setSubmittedData] = useState<SubmittedData | null>(null);
 
+  /* ── Companion ────────────────────── */
+  const [companionMsg, setCompanionMsg] = useState<string | null>(null);
+  const [companionCelebrate, setCompanionCelebrate] = useState(false);
+  const [eyeOffset, setEyeOffset] = useState({ x: 0, y: 0 });
+  const [blinkState, setBlinkState] = useState(false);
   const submitRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
+  const companionRef = useRef<HTMLDivElement>(null);
+  const celebrateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const msgTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prefersReducedMotion = useRef(
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false
+  );
+
+  // Section messages keyed to activeSection index
+  const SECTION_MESSAGES = useMemo(
+    () => [
+      "Let's start with the basics.",
+      "Tell me what you're building.",
+      "Who are we designing for?",
+      "Let's map out the essentials.",
+      "This is where the fun begins.",
+      "Last stretch — almost done!",
+    ],
+    []
+  );
+
+  const CELEBRATE_MESSAGES = ["Nice work!", "Looking great!", "Almost there!"];
+
+  // Show section message when activeSection changes
+  useEffect(() => {
+    if (msgTimer.current) clearTimeout(msgTimer.current);
+    setCompanionMsg(SECTION_MESSAGES[activeSection] ?? null);
+    msgTimer.current = setTimeout(() => setCompanionMsg(null), 3500);
+    return () => { if (msgTimer.current) clearTimeout(msgTimer.current); };
+  }, [activeSection, SECTION_MESSAGES]);
+
+  // Subtle cursor-aware eye movement (clamped to ±4px)
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (prefersReducedMotion.current || !companionRef.current) return;
+    const rect = companionRef.current.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    const strength = Math.min(dist / 300, 1);
+    setEyeOffset({
+      x: (dx / dist) * strength * 4,
+      y: (dy / dist) * strength * 4,
+    });
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [handleMouseMove]);
+
+  // Random blink every 3–6 seconds
+  useEffect(() => {
+    if (prefersReducedMotion.current) return;
+    const scheduleBlink = () => {
+      const delay = 3000 + Math.random() * 3000;
+      return setTimeout(() => {
+        setBlinkState(true);
+        setTimeout(() => setBlinkState(false), 150);
+        blinkTimerRef.current = scheduleBlink();
+      }, delay);
+    };
+    const blinkTimerRef = { current: scheduleBlink() };
+    return () => clearTimeout(blinkTimerRef.current);
+  }, []);
+
+  // Trigger celebration on section advance
+  const prevSection = useRef(activeSection);
+  useEffect(() => {
+    if (activeSection > prevSection.current) {
+      const msg =
+        CELEBRATE_MESSAGES[
+          Math.floor(Math.random() * CELEBRATE_MESSAGES.length)
+        ];
+      setCompanionCelebrate(true);
+      setCompanionMsg(msg);
+      if (celebrateTimer.current) clearTimeout(celebrateTimer.current);
+      celebrateTimer.current = setTimeout(() => {
+        setCompanionCelebrate(false);
+        setCompanionMsg(null);
+      }, 2500);
+    }
+    prevSection.current = activeSection;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSection]);
 
   /* ── Scroll + progress tracking ───── */
   useEffect(() => {
@@ -232,13 +326,14 @@ export default function ClientOnboarding() {
   /* ── Design tokens ────────────────── */
   const pageClass = darkMode ? "bg-zinc-950 text-white" : "bg-[#f6f7f9] text-zinc-900";
 
+  // Card: hover lift + subtle shadow increase
   const cardClass = darkMode
-    ? "bg-zinc-900 border border-zinc-800/80 rounded-[28px] p-7 md:p-12 shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
-    : "bg-white border border-zinc-200/60 rounded-[28px] p-7 md:p-12 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_24px_48px_-28px_rgba(0,0,0,0.16)]";
+    ? "bg-zinc-900 border border-zinc-800/80 rounded-[28px] p-7 md:p-12 shadow-[0_1px_2px_rgba(0,0,0,0.45)] transition-shadow duration-300 hover:shadow-[0_4px_24px_rgba(0,0,0,0.55)]"
+    : "bg-white border border-zinc-200/60 rounded-[28px] p-7 md:p-12 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_24px_48px_-28px_rgba(0,0,0,0.16)] transition-shadow duration-300 hover:shadow-[0_4px_32px_-8px_rgba(0,0,0,0.13),0_1px_4px_rgba(0,0,0,0.05)]";
 
   const inputBase = darkMode
-    ? "w-full rounded-2xl border bg-zinc-950 px-5 py-3.5 text-base text-white placeholder:text-zinc-500 transition duration-200 focus:outline-none focus:ring-4"
-    : "w-full rounded-2xl border bg-white px-5 py-3.5 text-base text-zinc-900 placeholder:text-zinc-400 transition duration-200 focus:outline-none focus:ring-4";
+    ? "w-full rounded-2xl border bg-zinc-950 px-5 py-3.5 text-sm text-zinc-300 placeholder:text-zinc-600 transition duration-200 focus:outline-none focus:ring-4"
+    : "w-full rounded-2xl border bg-white px-5 py-3.5 text-sm text-zinc-600 placeholder:text-zinc-400 transition duration-200 focus:outline-none focus:ring-4";
 
   const inputBorder = darkMode
     ? "border-zinc-700/70 focus:border-zinc-500 focus:ring-white/10"
@@ -248,36 +343,51 @@ export default function ClientOnboarding() {
   const inputClass = `${inputBase} ${inputBorder}`;
 
   const labelClass = darkMode
-    ? "block text-sm font-medium tracking-tight text-zinc-300 mb-2.5"
-    : "block text-sm font-medium tracking-tight text-zinc-700 mb-2.5";
+    ? "block text-sm font-medium tracking-tight text-zinc-300 mb-1 transition-colors duration-150 group-hover:text-[#6ea8fe]"
+    : "block text-sm font-medium tracking-tight text-zinc-700 mb-1 transition-colors duration-150 group-hover:text-[#1A73E8]";
 
   const helperClass = darkMode ? "text-zinc-400" : "text-zinc-500";
   const errorTextClass = darkMode ? "mt-2 text-sm font-medium text-red-400" : "mt-2 text-sm font-medium text-red-600";
-  const sectionTitleClass = "text-2xl md:text-[28px] font-semibold tracking-tight leading-tight";
+  const sectionTitleClass = "text-2xl md:text-[28px] font-semibold tracking-tight leading-tight transition-colors duration-200";
 
+  // Checkbox rows: hover accent border + bg tint
   const checkboxLabelClass = darkMode
-    ? "flex items-center gap-3 border border-zinc-800 rounded-2xl px-4 py-3.5 text-sm cursor-pointer transition hover:border-zinc-600 hover:bg-zinc-800/40"
-    : "flex items-center gap-3 border border-zinc-200 rounded-2xl px-4 py-3.5 text-sm cursor-pointer transition hover:border-zinc-300 hover:bg-zinc-50";
+    ? "flex items-center gap-3 border border-zinc-800 rounded-2xl px-4 py-3.5 text-sm cursor-pointer transition-all duration-200 hover:border-[#6ea8fe]/60 hover:bg-[#1A73E8]/8 hover:-translate-y-px hover:shadow-sm"
+    : "flex items-center gap-3 border border-zinc-200 rounded-2xl px-4 py-3.5 text-sm cursor-pointer transition-all duration-200 hover:border-[#1A73E8]/40 hover:bg-[#1A73E8]/[0.03] hover:-translate-y-px hover:shadow-sm";
 
-  const featureChipClass = (active: boolean) =>
-    active
-      ? darkMode
-        ? "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium cursor-pointer transition bg-white text-zinc-900 border border-white"
-        : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium cursor-pointer transition bg-zinc-900 text-white border border-zinc-900"
-      : darkMode
-      ? "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium cursor-pointer transition border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-800/40"
-      : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium cursor-pointer transition border border-zinc-200 text-zinc-700 hover:border-zinc-400 hover:bg-zinc-50";
+  // ── Shared chip base ────────────────────────────────────────
+  // Selected: blue→purple gradient, white text, glow ring.
+  // Hover: soft blue tint, accent border, 1px lift, scale 1.02.
+  // Applies to: visual style chips, contact pills, and future pill groups.
+  const chipBase = "inline-flex items-center gap-1.5 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:ring-offset-1";
 
+  const featureChipClass = (active: boolean) => {
+    if (active) {
+      return darkMode
+        ? `${chipBase} px-3.5 py-1.5 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] text-white border border-white/20 shadow-[0_2px_12px_rgba(37,99,235,0.45)]`
+        : `${chipBase} px-3.5 py-1.5 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] text-white border border-transparent shadow-[0_2px_12px_rgba(37,99,235,0.30)]`;
+    }
+    return darkMode
+      ? `${chipBase} px-3.5 py-1.5 border border-zinc-700 text-zinc-300 bg-transparent hover:border-[#7C3AED]/60 hover:bg-[#2563EB]/12 hover:text-[#93b4fd] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.20)]`
+      : `${chipBase} px-3.5 py-1.5 border border-zinc-200 text-zinc-600 bg-white hover:border-[#2563EB]/50 hover:bg-[#2563EB]/[0.05] hover:text-[#2563EB] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.12)]`;
+  };
+
+  // Removable selected-feature chips (×) — accent tint, matches gradient family
   const selectedChipClass = darkMode
-    ? "inline-flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-900 pl-3 pr-2 py-1.5 text-sm text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-800"
-    : "inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white pl-3 pr-2 py-1.5 text-sm text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50";
+    ? `${chipBase} pl-3 pr-2 py-1.5 border border-[#7C3AED]/50 bg-gradient-to-r from-[#2563EB]/25 to-[#7C3AED]/25 text-[#93b4fd] hover:from-[#2563EB]/35 hover:to-[#7C3AED]/35 hover:-translate-y-px`
+    : `${chipBase} pl-3 pr-2 py-1.5 border border-[#2563EB]/30 bg-gradient-to-r from-[#2563EB]/[0.07] to-[#7C3AED]/[0.07] text-[#2563EB] hover:from-[#2563EB]/[0.12] hover:to-[#7C3AED]/[0.12] hover:-translate-y-px`;
 
-  const contactPillClass = (active: boolean) =>
-    active
-      ? "px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition border bg-[#1A73E8] text-white border-[#1A73E8]"
-      : darkMode
-      ? "px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition border border-zinc-700 text-zinc-300 hover:border-zinc-500"
-      : "px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition border border-zinc-200 text-zinc-700 hover:border-zinc-400 hover:bg-zinc-50";
+  // Contact method pills — same system as featureChipClass
+  const contactPillClass = (active: boolean) => {
+    if (active) {
+      return darkMode
+        ? `${chipBase} px-4 py-2 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] text-white border border-white/20 shadow-[0_2px_12px_rgba(37,99,235,0.45)] scale-[1.02]`
+        : `${chipBase} px-4 py-2 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] text-white border border-transparent shadow-[0_2px_12px_rgba(37,99,235,0.30)] scale-[1.02]`;
+    }
+    return darkMode
+      ? `${chipBase} px-4 py-2 border border-zinc-700 text-zinc-300 bg-transparent hover:border-[#7C3AED]/60 hover:bg-[#2563EB]/12 hover:text-[#93b4fd] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.20)]`
+      : `${chipBase} px-4 py-2 border border-zinc-200 text-zinc-600 bg-white hover:border-[#2563EB]/50 hover:bg-[#2563EB]/[0.05] hover:text-[#2563EB] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.12)]`;
+  };
 
   const buttonClass =
     "inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 text-base font-medium rounded-full transition-all duration-200 bg-[#1A73E8] text-white shadow-sm hover:bg-[#1967D2] hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-[#1A73E8]/30 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-sm";
@@ -317,7 +427,7 @@ export default function ClientOnboarding() {
   }) => (
     <div className="mb-8">
       <h2 className={sectionTitleClass}>{title}</h2>
-      <p className={`mt-1.5 text-sm ${helperClass}`}>{subtitle}</p>
+      <p className={`mt-1.5 text-sm leading-6 ${helperClass}`}>{subtitle}</p>
     </div>
   );
 
@@ -338,11 +448,38 @@ export default function ClientOnboarding() {
 
           <div className="max-w-2xl mx-auto">
             <div className={cardClass}>
-              {/* check icon */}
-              <div className={`mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full text-3xl ${
-                darkMode ? "bg-white text-zinc-900" : "bg-[#1A73E8] text-white"
-              }`} aria-hidden="true">
-                ✓
+              {/* Companion celebration on success */}
+              <div className="flex flex-col items-center mb-8">
+                <div className="relative h-20 w-20 mb-3" aria-hidden="true">
+                  <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_4px_16px_rgba(26,115,232,0.35)]">
+                    <defs>
+                      <radialGradient id="bodyGradS" cx="42%" cy="35%" r="65%">
+                        <stop offset="0%" stopColor="#6ea8fe"/>
+                        <stop offset="100%" stopColor="#1A73E8"/>
+                      </radialGradient>
+                      <radialGradient id="cheekGradS" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stopColor="#ff9eb5" stopOpacity="0.7"/>
+                        <stop offset="100%" stopColor="#ff9eb5" stopOpacity="0"/>
+                      </radialGradient>
+                    </defs>
+                    <ellipse cx="28" cy="31" rx="19" ry="20" fill="url(#bodyGradS)"/>
+                    <ellipse cx="22" cy="22" rx="7" ry="5" fill="white" fillOpacity="0.18" transform="rotate(-20 22 22)"/>
+                    <ellipse cx="16" cy="34" rx="5" ry="3.5" fill="url(#cheekGradS)"/>
+                    <ellipse cx="40" cy="34" rx="5" ry="3.5" fill="url(#cheekGradS)"/>
+                    <ellipse cx="22" cy="28" rx="4.5" ry="4.5" fill="white"/>
+                    <ellipse cx="22" cy="28" rx="2.2" ry="2.2" fill="#1a1a3a"/>
+                    <ellipse cx="23.2" cy="26.8" rx="0.9" ry="0.9" fill="white" fillOpacity="0.9"/>
+                    <ellipse cx="34" cy="28" rx="4.5" ry="4.5" fill="white"/>
+                    <ellipse cx="34" cy="28" rx="2.2" ry="2.2" fill="#1a1a3a"/>
+                    <ellipse cx="35.2" cy="26.8" rx="0.9" ry="0.9" fill="white" fillOpacity="0.9"/>
+                    <path d="M22 37 Q28 43 34 37" stroke="white" strokeWidth="1.8" strokeLinecap="round" fill="none" strokeOpacity="0.9"/>
+                    <ellipse cx="9" cy="30" rx="3.5" ry="3" fill="#6ea8fe"/>
+                    <ellipse cx="47" cy="30" rx="3.5" ry="3" fill="#6ea8fe"/>
+                  </svg>
+                </div>
+                <span className="text-sm font-medium text-[#1A73E8]">
+                  🎉 Project brief received!
+                </span>
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-center">
@@ -351,7 +488,7 @@ export default function ClientOnboarding() {
 
               {/* next steps */}
               <div className="mt-10">
-                <p className={`text-xs font-semibold uppercase tracking-widest mb-4 ${helperClass}`}>
+                <p className={`text-xs leading-5 font-semibold uppercase tracking-widest mb-4 ${helperClass}`}>
                   What happens next
                 </p>
                 <ol className="space-y-3">
@@ -370,7 +507,7 @@ export default function ClientOnboarding() {
 
               {/* submission summary */}
               <div className={`mt-10 rounded-2xl p-6 ${darkMode ? "bg-zinc-800/60" : "bg-zinc-50"}`}>
-                <p className={`text-xs font-semibold uppercase tracking-widest mb-4 ${helperClass}`}>
+                <p className={`text-xs leading-5 font-semibold uppercase tracking-widest mb-4 ${helperClass}`}>
                   Your submission summary
                 </p>
                 <dl className="space-y-3">
@@ -417,20 +554,38 @@ export default function ClientOnboarding() {
   return (
     <div className={`min-h-screen ${pageClass}`}>
       {/* ── Sticky progress bar ────────── */}
-      <div className={`sticky top-0 z-40 backdrop-blur-sm border-b ${
-        darkMode ? "bg-zinc-950/80 border-zinc-800" : "bg-white/80 border-zinc-100"
+      <div className={`sticky top-0 z-40 backdrop-blur-md border-b ${
+        darkMode ? "bg-zinc-950/85 border-zinc-800" : "bg-white/85 border-zinc-100"
       }`}>
         <div className="max-w-5xl mx-auto px-6 py-3">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className={`text-xs font-medium ${helperClass}`}>
-              Step {activeSection + 1} of {SECTIONS.length} — {SECTIONS[activeSection]}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className={`text-xs leading-5 font-semibold ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                Step {activeSection + 1} of {SECTIONS.length}
+              </span>
+              <span className={`text-xs leading-5 ${helperClass}`}>
+                — {SECTIONS[activeSection]}
+              </span>
+              {companionCelebrate && (
+                <span className="text-xs font-medium text-[#1A73E8] animate-[fadeSlideUp_0.25s_ease-out]">
+                  ✓ {companionMsg}
+                </span>
+              )}
+            </div>
+            <span className={`text-xs leading-5 font-semibold tabular-nums ${
+              progressPct === 100 ? "text-[#1A73E8]" : helperClass
+            }`}>
+              {progressPct}%
             </span>
-            <span className={`text-xs font-medium ${helperClass}`}>{progressPct}%</span>
           </div>
-          <div className={`h-1 w-full rounded-full overflow-hidden ${darkMode ? "bg-zinc-800" : "bg-zinc-100"}`}>
+          <div className={`h-[3px] w-full rounded-full overflow-hidden ${darkMode ? "bg-zinc-800" : "bg-zinc-100"}`}>
             <div
-              className="h-full rounded-full bg-[#1A73E8] transition-all duration-500"
-              style={{ width: `${progressPct}%` }}
+              className="h-full rounded-full transition-all duration-700 ease-out"
+              style={{
+                width: `${progressPct}%`,
+                background: "linear-gradient(90deg, #1A73E8 0%, #6ea8fe 100%)",
+                boxShadow: progressPct > 0 ? "0 0 8px rgba(26,115,232,0.45)" : "none",
+              }}
               role="progressbar"
               aria-valuenow={progressPct}
               aria-valuemin={0}
@@ -458,13 +613,13 @@ export default function ClientOnboarding() {
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.05]">
             Let&apos;s build something meaningful.
           </h1>
-          <p className={`mt-6 text-lg md:text-2xl leading-relaxed font-light ${helperClass}`}>
+          <p className={`mt-6 text-base md:text-lg leading-7 font-light ${helperClass}`}>
             Share your goals, vision, and project requirements. This onboarding
             portal helps create a structured discovery process before design begins.
           </p>
 
           {/* required notice */}
-          <p className={`mt-5 text-sm ${helperClass}`}>
+          <p className={`mt-4 text-sm leading-7 ${helperClass}`}>
             Fields marked with <span className="font-semibold">*</span> are required.
             Most questions are optional, but the more details you provide, the better
             we can understand your project.
@@ -601,7 +756,7 @@ export default function ClientOnboarding() {
             <div className="space-y-5">
               <div>
                 <label htmlFor="project_description" className={labelClass}>Project Description</label>
-                <p className={`text-xs mb-2 ${helperClass}`}>Tell us what you&apos;re building.</p>
+                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>Tell us what you&apos;re building.</p>
                 <textarea
                   id="project_description" name="project_description" rows={4}
                   className={inputClass}
@@ -611,7 +766,7 @@ export default function ClientOnboarding() {
 
               <div>
                 <label htmlFor="project_goals" className={labelClass}>Project Goals</label>
-                <p className={`text-xs mb-2 ${helperClass}`}>
+                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
                   What outcome are you hoping to achieve? e.g. Increase sales, Get more signups, Improve usability, Launch MVP
                 </p>
                 <textarea
@@ -636,7 +791,7 @@ export default function ClientOnboarding() {
             <div className="space-y-5">
               <div>
                 <label htmlFor="target_audience" className={labelClass}>Who are your users?</label>
-                <p className={`text-xs mb-2 ${helperClass}`}>
+                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
                   Be as specific as possible — age, role, context of use, technical ability.
                 </p>
                 <textarea
@@ -648,7 +803,7 @@ export default function ClientOnboarding() {
 
               <div>
                 <label htmlFor="user_problems" className={labelClass}>What problems are they facing?</label>
-                <p className={`text-xs mb-2 ${helperClass}`}>
+                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
                   Describe the pain points your product will solve.
                 </p>
                 <textarea
@@ -675,7 +830,7 @@ export default function ClientOnboarding() {
             <div className="hidden md:block space-y-7">
               {FEATURE_GROUPS.map((group) => (
                 <div key={group.title}>
-                  <p className={`text-xs font-semibold uppercase tracking-widest mb-3 ${helperClass}`}>
+                  <p className={`text-xs leading-5 font-semibold uppercase tracking-widest mb-3 ${helperClass}`}>
                     {group.title}
                   </p>
                   <div className="grid md:grid-cols-2 gap-3">
@@ -746,7 +901,7 @@ export default function ClientOnboarding() {
             {/* Selected chips */}
             {selectedFeatures.length > 0 && (
               <div className="mt-5">
-                <p className={`text-xs font-medium mb-2 ${helperClass}`}>
+                <p className={`text-xs leading-5 font-medium mb-2 ${helperClass}`}>
                   {selectedFeatures.length} feature{selectedFeatures.length === 1 ? "" : "s"} selected
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -799,7 +954,7 @@ export default function ClientOnboarding() {
                 <label htmlFor="references" className={labelClass}>
                   Apps or Websites You Admire
                 </label>
-                <p className={`text-xs mb-2 ${helperClass}`}>
+                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
                   Tell us what you like about them — Navigation, Simplicity, Layout, Visual Style, Animations.
                 </p>
                 <textarea
@@ -814,7 +969,7 @@ export default function ClientOnboarding() {
                 <label htmlFor="reference_links" className={labelClass}>
                   Paste URLs Here
                 </label>
-                <p className={`text-xs mb-2 ${helperClass}`}>
+                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
                   Share links to Google Drive, Figma, Dropbox, Behance, Dribbble, Pinterest, or any relevant files.
                 </p>
                 <textarea
@@ -827,20 +982,28 @@ export default function ClientOnboarding() {
               {/* Visual style chips */}
               <div>
                 <label className={labelClass}>Visual Style</label>
-                <p className={`text-xs mb-3 ${helperClass}`}>
+                <p className={`text-xs leading-5 mb-3 ${helperClass}`}>
                   Select all that apply. Multiple choices are fine.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {STYLE_CHIPS.map((s) => (
-                    <button
-                      key={s} type="button"
-                      onClick={() => toggleStyle(s)}
-                      aria-pressed={selectedStyles.includes(s)}
-                      className={featureChipClass(selectedStyles.includes(s))}
-                    >
-                      {s}
-                    </button>
-                  ))}
+                  {STYLE_CHIPS.map((s) => {
+                    const active = selectedStyles.includes(s);
+                    return (
+                      <button
+                        key={s} type="button"
+                        onClick={() => toggleStyle(s)}
+                        aria-pressed={active}
+                        className={featureChipClass(active)}
+                      >
+                        {active && (
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="shrink-0">
+                            <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                        {s}
+                      </button>
+                    );
+                  })}
                 </div>
                 {/* Hidden inputs for style selections */}
                 {selectedStyles.map((s) => (
@@ -869,7 +1032,7 @@ export default function ClientOnboarding() {
             {/* Budget */}
             <div className="mb-6">
               <label htmlFor="budget" className={labelClass}>Budget</label>
-              <p className={`text-xs mb-2 ${helperClass}`}>
+              <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
                 Any range is helpful — we can work with most budgets.
               </p>
               <input
@@ -881,20 +1044,28 @@ export default function ClientOnboarding() {
             {/* Contact method pills */}
             <div className="mb-6">
               <label className={labelClass}>Preferred Contact Method</label>
-              <p className={`text-xs mb-3 ${helperClass}`}>
+              <p className={`text-xs leading-5 mb-3 ${helperClass}`}>
                 Select all that work for you.
               </p>
               <div className="flex flex-wrap gap-2">
-                {CONTACT_OPTIONS.map((c) => (
-                  <button
-                    key={c} type="button"
-                    onClick={() => toggleContact(c)}
-                    aria-pressed={selectedContacts.includes(c)}
-                    className={contactPillClass(selectedContacts.includes(c))}
-                  >
-                    {c}
-                  </button>
-                ))}
+                {CONTACT_OPTIONS.map((c) => {
+                  const active = selectedContacts.includes(c);
+                  return (
+                    <button
+                      key={c} type="button"
+                      onClick={() => toggleContact(c)}
+                      aria-pressed={active}
+                      className={contactPillClass(active)}
+                    >
+                      {active && (
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="shrink-0">
+                          <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                      {c}
+                    </button>
+                  );
+                })}
               </div>
               {selectedContacts.map((c) => (
                 <input key={c} type="hidden" name="contact_method" value={c} />
@@ -967,6 +1138,157 @@ export default function ClientOnboarding() {
           </button>
         )}
       </div>
+      {/* ── Onboarding Companion ───────── */}
+      {!submitted && (
+        <div
+          ref={companionRef}
+          className="fixed bottom-44 right-5 sm:right-6 z-50 flex flex-col items-end gap-2"
+          aria-live="polite"
+          aria-label="Onboarding assistant"
+        >
+          {/* Speech bubble */}
+          {companionMsg && (
+            <div
+              className={`
+                max-w-[180px] rounded-2xl px-3.5 py-2.5 text-xs font-medium leading-5
+                shadow-lg border animate-[fadeSlideUp_0.25s_ease-out]
+                ${darkMode
+                  ? "bg-zinc-800 border-zinc-700 text-zinc-200"
+                  : "bg-white border-zinc-200 text-zinc-700"}
+                ${companionCelebrate ? "text-[#1A73E8]" : ""}
+              `}
+            >
+              {companionCelebrate && (
+                <span className="mr-1" aria-hidden="true">✓</span>
+              )}
+              {companionMsg}
+              {/* bubble tail */}
+              <span
+                className={`absolute -bottom-1.5 right-5 h-3 w-3 rotate-45 border-r border-b ${
+                  darkMode
+                    ? "bg-zinc-800 border-zinc-700"
+                    : "bg-white border-zinc-200"
+                }`}
+                aria-hidden="true"
+              />
+            </div>
+          )}
+
+          {/* Mascot */}
+          <div
+            className={`
+              relative h-14 w-14 select-none
+              ${prefersReducedMotion.current ? "" : "animate-[companionFloat_4s_ease-in-out_infinite]"}
+              ${companionCelebrate && !prefersReducedMotion.current
+                ? "animate-[companionBounce_0.5s_ease-in-out_2]"
+                : ""}
+            `}
+            aria-hidden="true"
+          >
+            <svg
+              viewBox="0 0 56 56"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-full h-full drop-shadow-[0_4px_12px_rgba(0,0,0,0.18)]"
+            >
+              <defs>
+                <radialGradient id="bodyGrad" cx="42%" cy="35%" r="65%">
+                  <stop offset="0%" stopColor="#6ea8fe" />
+                  <stop offset="100%" stopColor="#1A73E8" />
+                </radialGradient>
+                <radialGradient id="cheekGrad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#ff9eb5" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#ff9eb5" stopOpacity="0" />
+                </radialGradient>
+                <radialGradient id="eyeGrad" cx="40%" cy="30%" r="60%">
+                  <stop offset="0%" stopColor="#4a4a6a" />
+                  <stop offset="100%" stopColor="#1a1a3a" />
+                </radialGradient>
+                <filter id="softShadow" x="-20%" y="-10%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="2" stdDeviation="2" floodOpacity="0.15" />
+                </filter>
+              </defs>
+
+              {/* Body */}
+              <ellipse cx="28" cy="31" rx="19" ry="20" fill="url(#bodyGrad)" filter="url(#softShadow)" />
+
+              {/* Highlight sheen */}
+              <ellipse cx="22" cy="22" rx="7" ry="5" fill="white" fillOpacity="0.18" transform="rotate(-20 22 22)" />
+
+              {/* Cheeks */}
+              <ellipse cx="16" cy="34" rx="5" ry="3.5" fill="url(#cheekGrad)" />
+              <ellipse cx="40" cy="34" rx="5" ry="3.5" fill="url(#cheekGrad)" />
+
+              {/* Left eye white */}
+              <ellipse cx="22" cy="28" rx="4.5" ry={blinkState ? 0.6 : 4.5} fill="white" />
+              {/* Left pupil */}
+              {!blinkState && (
+                <ellipse
+                  cx={22 + eyeOffset.x * 0.6}
+                  cy={28 + eyeOffset.y * 0.6}
+                  rx="2.2"
+                  ry="2.2"
+                  fill="url(#eyeGrad)"
+                />
+              )}
+              {/* Left eye shine */}
+              {!blinkState && (
+                <ellipse
+                  cx={23.2 + eyeOffset.x * 0.4}
+                  cy={26.8 + eyeOffset.y * 0.4}
+                  rx="0.9"
+                  ry="0.9"
+                  fill="white"
+                  fillOpacity="0.9"
+                />
+              )}
+
+              {/* Right eye white */}
+              <ellipse cx="34" cy="28" rx="4.5" ry={blinkState ? 0.6 : 4.5} fill="white" />
+              {/* Right pupil */}
+              {!blinkState && (
+                <ellipse
+                  cx={34 + eyeOffset.x * 0.6}
+                  cy={28 + eyeOffset.y * 0.6}
+                  rx="2.2"
+                  ry="2.2"
+                  fill="url(#eyeGrad)"
+                />
+              )}
+              {/* Right eye shine */}
+              {!blinkState && (
+                <ellipse
+                  cx={35.2 + eyeOffset.x * 0.4}
+                  cy={26.8 + eyeOffset.y * 0.4}
+                  rx="0.9"
+                  ry="0.9"
+                  fill="white"
+                  fillOpacity="0.9"
+                />
+              )}
+
+              {/* Smile */}
+              <path
+                d={companionCelebrate ? "M22 37 Q28 43 34 37" : "M22 37 Q28 41 34 37"}
+                stroke="white"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                fill="none"
+                strokeOpacity="0.9"
+              />
+
+              {/* Tiny hands when celebrating */}
+              {companionCelebrate && (
+                <>
+                  <ellipse cx="9" cy="30" rx="3.5" ry="3" fill="#6ea8fe" />
+                  <ellipse cx="47" cy="30" rx="3.5" ry="3" fill="#6ea8fe" />
+                </>
+              )}
+            </svg>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
