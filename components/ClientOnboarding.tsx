@@ -392,8 +392,8 @@ export default function ClientOnboarding() {
     : "w-full rounded-[10px] border bg-white px-5 py-[15px] text-base text-[#1E3A5F] placeholder:text-[#94A3B8] transition-all duration-200 focus:outline-none focus:ring-[3px]";
 
   const inputBorder = darkMode
-    ? "border-zinc-700/60 hover:border-zinc-600 focus:border-[#1A73E8] focus:ring-[#1A73E8]/18"
-    : "border-zinc-200 hover:border-zinc-300 focus:border-[#1A73E8] focus:ring-[#1A73E8]/12";
+    ? "border-zinc-500 hover:border-zinc-400 focus:border-[#1A73E8] focus:ring-[#1A73E8]/18"
+    : "border-[#BABABA] hover:border-[#888888] focus:border-[#1A73E8] focus:ring-[#1A73E8]/12";
 
   const inputErrorBorder = "border-red-400 focus:border-red-500 focus:ring-red-500/15";
   const inputClass = `${inputBase} ${inputBorder}`;
@@ -413,8 +413,8 @@ export default function ClientOnboarding() {
 
   // Checkbox rows: premium hover with blue accent
   const checkboxLabelClass = darkMode
-    ? "flex items-center gap-3.5 border border-zinc-800 rounded-xl px-4 py-4 text-sm text-zinc-300 cursor-pointer transition-all duration-200 hover:border-[#1A73E8]/50 hover:bg-[#1A73E8]/[0.06] hover:-translate-y-px hover:shadow-sm"
-    : "flex items-center gap-3.5 border border-zinc-200 rounded-xl px-4 py-4 text-sm text-zinc-700 cursor-pointer transition-all duration-200 hover:border-[#1A73E8]/35 hover:bg-[#1A73E8]/[0.025] hover:-translate-y-px hover:shadow-sm";
+    ? "flex items-center gap-3.5 border border-zinc-500 rounded-xl px-4 py-4 text-sm text-zinc-300 cursor-pointer transition-all duration-200 hover:border-[#1A73E8]/50 hover:bg-[#1A73E8]/[0.06] hover:-translate-y-px hover:shadow-sm"
+    : "flex items-center gap-3.5 border border-[#BABABA] rounded-xl px-4 py-4 text-sm text-zinc-700 cursor-pointer transition-all duration-200 hover:border-[#1A73E8]/50 hover:bg-[#1A73E8]/[0.025] hover:-translate-y-px hover:shadow-sm";
 
   // ── Shared chip base
   const chipBase = "inline-flex items-center gap-1.5 rounded-full text-[13px] font-medium cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/35 focus:ring-offset-1";
@@ -478,22 +478,18 @@ export default function ClientOnboarding() {
   const SectionHeader = ({
     title,
     subtitle,
-    icon,
+    icon: _icon,
+    illustration,
   }: {
     title: string;
     subtitle: string;
     icon: React.ReactNode;
+    illustration: React.ReactNode;
   }) => (
     <div className="mb-10">
-      <div className="flex items-center gap-3.5 mb-2">
-        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-          darkMode ? "bg-zinc-800" : "bg-[#F1F5F9]"
-        }`}>
-          {icon}
-        </div>
-        <h2 className={sectionTitleClass}>{title}</h2>
-      </div>
-      <p className={`ml-[58px] text-[14px] leading-6 ${helperClass}`}>{subtitle}</p>
+      <div className="mb-5">{illustration}</div>
+      <h2 className={sectionTitleClass}>{title}</h2>
+      <p className={`mt-2 text-[14px] leading-6 ${helperClass}`}>{subtitle}</p>
     </div>
   );
 
@@ -721,6 +717,16 @@ export default function ClientOnboarding() {
             <SectionHeader
               title="Personal Information"
               subtitle="Tell me who you are and the best way to contact you."
+              illustration={
+                <svg width="72" height="64" viewBox="0 0 72 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="8" y="12" width="56" height="40" rx="6" stroke="#CBD5E1" strokeWidth="2"/>
+                  <circle cx="36" cy="28" r="8" stroke="#1A73E8" strokeWidth="2"/>
+                  <path d="M18 52c0-9.941 8.059-16 18-16s18 6.059 18 16" stroke="#1A73E8" strokeWidth="2" strokeLinecap="round"/>
+                  <rect x="20" y="8" width="32" height="6" rx="3" fill="#E2E8F0"/>
+                  <circle cx="60" cy="14" r="8" fill="white" stroke="#CBD5E1" strokeWidth="1.5"/>
+                  <path d="M57 14l2 2 4-4" stroke="#1A73E8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              }
               icon={
                 <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="10" cy="7" r="3.5" fill="#1A73E8"/>
@@ -776,6 +782,18 @@ export default function ClientOnboarding() {
             <SectionHeader
               title="Project Details"
               subtitle="Help me understand what you're building and your timeline."
+              illustration={
+                <svg width="72" height="64" viewBox="0 0 72 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="10" y="18" width="52" height="38" rx="5" stroke="#CBD5E1" strokeWidth="2"/>
+                  <path d="M36 6L36 22M28 10L36 6L44 10" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="36" cy="6" r="4" fill="#7C3AED"/>
+                  <rect x="18" y="30" width="16" height="3" rx="1.5" fill="#E2E8F0"/>
+                  <rect x="18" y="38" width="24" height="3" rx="1.5" fill="#E2E8F0"/>
+                  <rect x="18" y="46" width="20" height="3" rx="1.5" fill="#E2E8F0"/>
+                  <circle cx="56" cy="26" r="8" fill="white" stroke="#7C3AED" strokeWidth="1.5"/>
+                  <path d="M53 26l2 2 4-4" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              }
               icon={
                 <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M10 2C10 2 6 6 6 11h8c0-5-4-9-4-9z" fill="#7C3AED"/>
@@ -870,6 +888,15 @@ export default function ClientOnboarding() {
             <SectionHeader
               title="Target Audience"
               subtitle="Tell me who this product is designed for."
+              illustration={
+                <svg width="72" height="64" viewBox="0 0 72 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="28" cy="24" r="10" stroke="#10B981" strokeWidth="2"/>
+                  <circle cx="48" cy="22" r="8" stroke="#10B981" strokeWidth="2" strokeDasharray="3 2"/>
+                  <path d="M8 52c0-11 9-18 20-18s20 7 20 18" stroke="#10B981" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M48 30c6 1 12 6 12 14" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.5"/>
+                  <circle cx="28" cy="24" r="4" fill="#10B981" fillOpacity="0.2"/>
+                </svg>
+              }
               icon={
                 <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="7.5" cy="7" r="2.8" fill="#10B981"/>
@@ -915,6 +942,17 @@ export default function ClientOnboarding() {
             <SectionHeader
               title="Key Features Needed"
               subtitle="Select the features you need. Add anything custom below."
+              illustration={
+                <svg width="72" height="64" viewBox="0 0 72 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="8" y="10" width="56" height="44" rx="6" stroke="#CBD5E1" strokeWidth="2"/>
+                  <path d="M36 4L42 16L36 28L30 16Z" fill="#F59E0B"/>
+                  <rect x="18" y="28" width="10" height="10" rx="2" stroke="#F59E0B" strokeWidth="1.8"/>
+                  <rect x="33" y="28" width="10" height="10" rx="2" stroke="#F59E0B" strokeWidth="1.8"/>
+                  <rect x="48" y="28" width="10" height="10" rx="2" stroke="#CBD5E1" strokeWidth="1.8"/>
+                  <rect x="18" y="42" width="10" height="5" rx="1" fill="#FDE68A"/>
+                  <rect x="33" y="42" width="10" height="5" rx="1" fill="#FDE68A"/>
+                </svg>
+              }
               icon={
                 <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M11 2L4 11h6.5L9 18l7-9h-6.5L11 2z" fill="#F59E0B" stroke="#F59E0B" strokeWidth="0.5" strokeLinejoin="round"/>
@@ -1042,6 +1080,17 @@ export default function ClientOnboarding() {
             <SectionHeader
               title="Design Preferences"
               subtitle="Share references and visual examples you admire."
+              illustration={
+                <svg width="72" height="64" viewBox="0 0 72 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="36" cy="32" r="22" stroke="#CBD5E1" strokeWidth="2"/>
+                  <circle cx="26" cy="26" r="6" stroke="#EC4899" strokeWidth="2"/>
+                  <circle cx="46" cy="26" r="6" stroke="#F472B6" strokeWidth="2"/>
+                  <circle cx="36" cy="42" r="6" stroke="#EC4899" strokeWidth="2"/>
+                  <path d="M30 30Q36 20 42 30" stroke="#EC4899" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="58" cy="12" r="7" fill="white" stroke="#EC4899" strokeWidth="1.5"/>
+                  <path d="M55 12Q58 8 61 12" stroke="#EC4899" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              }
               icon={
                 <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="10" cy="10" r="7.5" stroke="#EC4899" strokeWidth="1.8"/>
@@ -1164,6 +1213,16 @@ export default function ClientOnboarding() {
             <SectionHeader
               title="Budget & Communication"
               subtitle="Help me understand your budget and how we should stay in touch."
+              illustration={
+                <svg width="72" height="64" viewBox="0 0 72 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="8" y="16" width="42" height="32" rx="5" stroke="#CBD5E1" strokeWidth="2"/>
+                  <path d="M50 24L64 16L64 48L50 40Z" stroke="#0369A1" strokeWidth="2" strokeLinejoin="round"/>
+                  <circle cx="29" cy="32" r="8" stroke="#0369A1" strokeWidth="2"/>
+                  <text x="29" y="36" textAnchor="middle" fontSize="9" fontWeight="700" fill="#0369A1" fontFamily="sans-serif">$</text>
+                  <circle cx="60" cy="10" r="6" fill="white" stroke="#0369A1" strokeWidth="1.5"/>
+                  <path d="M57.5 10l1.5 1.5 3-3" stroke="#0369A1" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              }
               icon={
                 <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect x="2" y="3" width="16" height="11" rx="2.5" fill="#0369A1"/>
