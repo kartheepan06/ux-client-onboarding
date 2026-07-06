@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,6 +12,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
 /**
  * FAVICON SETUP
  * -------------
@@ -20,10 +27,6 @@ const geistMono = Geist_Mono({
  *
  *   app/favicon.ico        <- preferred (App Router convention)
  *   public/favicon.ico     <- also works
- *
- * Place your .ico file in either path and Next.js will wire it up on build.
- * (You can additionally add app/icon.png and app/apple-icon.png for higher-res
- * and iOS home-screen icons if you want.)
  */
 
 export const metadata: Metadata = {
@@ -40,7 +43,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

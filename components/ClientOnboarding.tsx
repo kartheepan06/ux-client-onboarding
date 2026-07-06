@@ -48,16 +48,71 @@ const FEATURE_GROUPS: { title: string; items: string[] }[] = [
 
 const ALL_FEATURES = FEATURE_GROUPS.flatMap((g) => g.items);
 
-const STYLE_CHIPS = [
-  "Minimal",
-  "Modern",
-  "Premium",
-  "Playful",
-  "Bold",
-  "Corporate",
-  "Luxury",
-  "Dark",
-  "Vibrant",
+// Each style chip has its own color identity.
+// from/to = gradient stops. hover = border+text hint. glow = box-shadow alpha.
+const STYLE_CHIPS: {
+  label: string;
+  from: string;
+  to: string;
+  hoverBorder: string;
+  hoverText: string;
+  hoverBg: string;
+  glow: string;
+}[] = [
+  {
+    label: "Minimal",
+    from: "#64748B", to: "#94A3B8",
+    hoverBorder: "#64748B", hoverText: "#334155", hoverBg: "rgba(100,116,139,0.08)",
+    glow: "rgba(100,116,139,0.30)",
+  },
+  {
+    label: "Modern",
+    from: "#2563EB", to: "#06B6D4",
+    hoverBorder: "#2563EB", hoverText: "#1D4ED8", hoverBg: "rgba(37,99,235,0.07)",
+    glow: "rgba(37,99,235,0.35)",
+  },
+  {
+    label: "Premium",
+    from: "#D97706", to: "#F59E0B",
+    hoverBorder: "#D97706", hoverText: "#B45309", hoverBg: "rgba(217,119,6,0.08)",
+    glow: "rgba(217,119,6,0.32)",
+  },
+  {
+    label: "Playful",
+    from: "#EC4899", to: "#A855F7",
+    hoverBorder: "#EC4899", hoverText: "#DB2777", hoverBg: "rgba(236,72,153,0.08)",
+    glow: "rgba(236,72,153,0.32)",
+  },
+  {
+    label: "Bold",
+    from: "#EF4444", to: "#F97316",
+    hoverBorder: "#EF4444", hoverText: "#DC2626", hoverBg: "rgba(239,68,68,0.08)",
+    glow: "rgba(239,68,68,0.30)",
+  },
+  {
+    label: "Corporate",
+    from: "#0369A1", to: "#0284C7",
+    hoverBorder: "#0369A1", hoverText: "#075985", hoverBg: "rgba(3,105,161,0.08)",
+    glow: "rgba(3,105,161,0.30)",
+  },
+  {
+    label: "Luxury",
+    from: "#7C3AED", to: "#4F46E5",
+    hoverBorder: "#7C3AED", hoverText: "#6D28D9", hoverBg: "rgba(124,58,237,0.08)",
+    glow: "rgba(124,58,237,0.32)",
+  },
+  {
+    label: "Dark",
+    from: "#1E293B", to: "#334155",
+    hoverBorder: "#475569", hoverText: "#1E293B", hoverBg: "rgba(30,41,59,0.08)",
+    glow: "rgba(30,41,59,0.40)",
+  },
+  {
+    label: "Vibrant",
+    from: "#10B981", to: "#06B6D4",
+    hoverBorder: "#10B981", hoverText: "#059669", hoverBg: "rgba(16,185,129,0.08)",
+    glow: "rgba(16,185,129,0.30)",
+  },
 ];
 
 const CONTACT_OPTIONS = ["Email", "WhatsApp", "Phone Call", "Video Call"];
@@ -324,73 +379,75 @@ export default function ClientOnboarding() {
   };
 
   /* ── Design tokens ────────────────── */
-  const pageClass = darkMode ? "bg-zinc-950 text-white" : "bg-[#f6f7f9] text-zinc-900";
+  const pageClass = darkMode ? "bg-[#0d0d0f] text-white" : "bg-[#f4f5f7] text-[#0B3558]";
 
-  // Card: hover lift + subtle shadow increase
+  // Card: more padding, softer border, refined shadow
   const cardClass = darkMode
-    ? "bg-zinc-900 border border-zinc-800/80 rounded-[28px] p-7 md:p-12 shadow-[0_1px_2px_rgba(0,0,0,0.45)] transition-shadow duration-300 hover:shadow-[0_4px_24px_rgba(0,0,0,0.55)]"
-    : "bg-white border border-zinc-200/60 rounded-[28px] p-7 md:p-12 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_24px_48px_-28px_rgba(0,0,0,0.16)] transition-shadow duration-300 hover:shadow-[0_4px_32px_-8px_rgba(0,0,0,0.13),0_1px_4px_rgba(0,0,0,0.05)]";
+    ? "bg-[#18181b] border border-zinc-800/60 rounded-[20px] p-8 md:p-14 shadow-[0_1px_2px_rgba(0,0,0,0.5)] transition-shadow duration-300 hover:shadow-[0_4px_24px_rgba(0,0,0,0.60)]"
+    : "bg-white border border-zinc-200/50 rounded-[20px] p-8 md:p-14 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_16px_48px_-20px_rgba(0,0,0,0.10)] transition-shadow duration-300 hover:shadow-[0_4px_32px_-8px_rgba(0,0,0,0.11),0_1px_4px_rgba(0,0,0,0.04)]";
 
+  // Inputs: 56px height, 10px radius (Calendly-style), generous padding, premium focus ring
   const inputBase = darkMode
-    ? "w-full rounded-2xl border bg-zinc-950 px-5 py-3.5 text-sm text-zinc-300 placeholder:text-zinc-600 transition duration-200 focus:outline-none focus:ring-4"
-    : "w-full rounded-2xl border bg-white px-5 py-3.5 text-sm text-zinc-600 placeholder:text-zinc-400 transition duration-200 focus:outline-none focus:ring-4";
+    ? "w-full rounded-[10px] border bg-[#0d0d0f] px-5 py-[15px] text-base text-zinc-200 placeholder:text-zinc-600 transition-all duration-200 focus:outline-none focus:ring-[3px]"
+    : "w-full rounded-[10px] border bg-white px-5 py-[15px] text-base text-[#1E3A5F] placeholder:text-[#94A3B8] transition-all duration-200 focus:outline-none focus:ring-[3px]";
 
   const inputBorder = darkMode
-    ? "border-zinc-700/70 focus:border-zinc-500 focus:ring-white/10"
-    : "border-zinc-200 focus:border-zinc-400 focus:ring-zinc-900/5";
+    ? "border-zinc-700/60 hover:border-zinc-600 focus:border-[#1A73E8] focus:ring-[#1A73E8]/18"
+    : "border-zinc-200 hover:border-zinc-300 focus:border-[#1A73E8] focus:ring-[#1A73E8]/12";
 
-  const inputErrorBorder = "border-red-500 focus:border-red-500 focus:ring-red-500/20";
+  const inputErrorBorder = "border-red-400 focus:border-red-500 focus:ring-red-500/15";
   const inputClass = `${inputBase} ${inputBorder}`;
 
+  // Labels: 13.5px, medium, zinc-600, tighter spacing
   const labelClass = darkMode
-    ? "block text-sm font-medium tracking-tight text-zinc-300 mb-1 transition-colors duration-150 group-hover:text-[#6ea8fe]"
-    : "block text-sm font-medium tracking-tight text-zinc-700 mb-1 transition-colors duration-150 group-hover:text-[#1A73E8]";
+    ? "block text-[13.5px] font-medium text-zinc-400 mb-1.5 leading-5"
+    : "block text-[13.5px] font-medium text-[#1E3A5F] mb-1.5 leading-5";
 
-  const helperClass = darkMode ? "text-zinc-400" : "text-zinc-500";
-  const errorTextClass = darkMode ? "mt-2 text-sm font-medium text-red-400" : "mt-2 text-sm font-medium text-red-600";
-  const sectionTitleClass = "text-2xl md:text-[28px] font-semibold tracking-tight leading-tight transition-colors duration-200";
+  const helperClass = darkMode ? "text-zinc-500" : "text-[#64748B]";
+  const errorTextClass = darkMode ? "mt-2 text-xs font-medium text-red-400" : "mt-2 text-xs font-medium text-red-500";
 
-  // Checkbox rows: hover accent border + bg tint
+  // Deep navy headings (Calendly: rgb(11, 53, 88)) + softer section titles
+  const sectionTitleClass = darkMode
+    ? "text-[22px] md:text-[28px] font-bold tracking-[-0.3px] leading-snug text-white"
+    : "text-[22px] md:text-[28px] font-bold tracking-[-0.3px] leading-snug text-[#0B3558]";
+
+  // Checkbox rows: premium hover with blue accent
   const checkboxLabelClass = darkMode
-    ? "flex items-center gap-3 border border-zinc-800 rounded-2xl px-4 py-3.5 text-sm cursor-pointer transition-all duration-200 hover:border-[#6ea8fe]/60 hover:bg-[#1A73E8]/8 hover:-translate-y-px hover:shadow-sm"
-    : "flex items-center gap-3 border border-zinc-200 rounded-2xl px-4 py-3.5 text-sm cursor-pointer transition-all duration-200 hover:border-[#1A73E8]/40 hover:bg-[#1A73E8]/[0.03] hover:-translate-y-px hover:shadow-sm";
+    ? "flex items-center gap-3.5 border border-zinc-800 rounded-xl px-4 py-4 text-sm text-zinc-300 cursor-pointer transition-all duration-200 hover:border-[#1A73E8]/50 hover:bg-[#1A73E8]/[0.06] hover:-translate-y-px hover:shadow-sm"
+    : "flex items-center gap-3.5 border border-zinc-200 rounded-xl px-4 py-4 text-sm text-zinc-700 cursor-pointer transition-all duration-200 hover:border-[#1A73E8]/35 hover:bg-[#1A73E8]/[0.025] hover:-translate-y-px hover:shadow-sm";
 
-  // ── Shared chip base ────────────────────────────────────────
-  // Selected: blue→purple gradient, white text, glow ring.
-  // Hover: soft blue tint, accent border, 1px lift, scale 1.02.
-  // Applies to: visual style chips, contact pills, and future pill groups.
-  const chipBase = "inline-flex items-center gap-1.5 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:ring-offset-1";
+  // ── Shared chip base
+  const chipBase = "inline-flex items-center gap-1.5 rounded-full text-[13px] font-medium cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/35 focus:ring-offset-1";
 
   const featureChipClass = (active: boolean) => {
     if (active) {
       return darkMode
         ? `${chipBase} px-3.5 py-1.5 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] text-white border border-white/20 shadow-[0_2px_12px_rgba(37,99,235,0.45)]`
-        : `${chipBase} px-3.5 py-1.5 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] text-white border border-transparent shadow-[0_2px_12px_rgba(37,99,235,0.30)]`;
+        : `${chipBase} px-3.5 py-1.5 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] text-white border border-transparent shadow-[0_2px_12px_rgba(37,99,235,0.28)]`;
     }
     return darkMode
-      ? `${chipBase} px-3.5 py-1.5 border border-zinc-700 text-zinc-300 bg-transparent hover:border-[#7C3AED]/60 hover:bg-[#2563EB]/12 hover:text-[#93b4fd] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.20)]`
-      : `${chipBase} px-3.5 py-1.5 border border-zinc-200 text-zinc-600 bg-white hover:border-[#2563EB]/50 hover:bg-[#2563EB]/[0.05] hover:text-[#2563EB] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.12)]`;
+      ? `${chipBase} px-3.5 py-1.5 border border-zinc-700 text-zinc-400 bg-transparent hover:border-[#7C3AED]/55 hover:bg-[#2563EB]/10 hover:text-[#93b4fd] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.18)]`
+      : `${chipBase} px-3.5 py-1.5 border border-zinc-200 text-zinc-500 bg-white hover:border-[#2563EB]/45 hover:bg-[#2563EB]/[0.04] hover:text-[#2563EB] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.10)]`;
   };
 
-  // Removable selected-feature chips (×) — accent tint, matches gradient family
   const selectedChipClass = darkMode
-    ? `${chipBase} pl-3 pr-2 py-1.5 border border-[#7C3AED]/50 bg-gradient-to-r from-[#2563EB]/25 to-[#7C3AED]/25 text-[#93b4fd] hover:from-[#2563EB]/35 hover:to-[#7C3AED]/35 hover:-translate-y-px`
-    : `${chipBase} pl-3 pr-2 py-1.5 border border-[#2563EB]/30 bg-gradient-to-r from-[#2563EB]/[0.07] to-[#7C3AED]/[0.07] text-[#2563EB] hover:from-[#2563EB]/[0.12] hover:to-[#7C3AED]/[0.12] hover:-translate-y-px`;
+    ? `${chipBase} pl-3 pr-2 py-1.5 border border-[#7C3AED]/45 bg-gradient-to-r from-[#2563EB]/22 to-[#7C3AED]/22 text-[#93b4fd] hover:from-[#2563EB]/32 hover:to-[#7C3AED]/32 hover:-translate-y-px`
+    : `${chipBase} pl-3 pr-2 py-1.5 border border-[#2563EB]/28 bg-gradient-to-r from-[#2563EB]/[0.06] to-[#7C3AED]/[0.06] text-[#2563EB] hover:from-[#2563EB]/[0.10] hover:to-[#7C3AED]/[0.10] hover:-translate-y-px`;
 
-  // Contact method pills — same system as featureChipClass
   const contactPillClass = (active: boolean) => {
     if (active) {
       return darkMode
-        ? `${chipBase} px-4 py-2 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] text-white border border-white/20 shadow-[0_2px_12px_rgba(37,99,235,0.45)] scale-[1.02]`
-        : `${chipBase} px-4 py-2 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] text-white border border-transparent shadow-[0_2px_12px_rgba(37,99,235,0.30)] scale-[1.02]`;
+        ? `${chipBase} px-4 py-2 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] text-white border border-white/20 shadow-[0_2px_12px_rgba(37,99,235,0.40)] scale-[1.02]`
+        : `${chipBase} px-4 py-2 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] text-white border border-transparent shadow-[0_2px_12px_rgba(37,99,235,0.26)] scale-[1.02]`;
     }
     return darkMode
-      ? `${chipBase} px-4 py-2 border border-zinc-700 text-zinc-300 bg-transparent hover:border-[#7C3AED]/60 hover:bg-[#2563EB]/12 hover:text-[#93b4fd] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.20)]`
-      : `${chipBase} px-4 py-2 border border-zinc-200 text-zinc-600 bg-white hover:border-[#2563EB]/50 hover:bg-[#2563EB]/[0.05] hover:text-[#2563EB] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.12)]`;
+      ? `${chipBase} px-4 py-2 border border-zinc-700 text-zinc-400 bg-transparent hover:border-[#7C3AED]/55 hover:bg-[#2563EB]/10 hover:text-[#93b4fd] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.18)]`
+      : `${chipBase} px-4 py-2 border border-zinc-200 text-zinc-500 bg-white hover:border-[#2563EB]/45 hover:bg-[#2563EB]/[0.04] hover:text-[#2563EB] hover:scale-[1.02] hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.10)]`;
   };
 
+  // CTA: taller, wider, premium presence
   const buttonClass =
-    "inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 text-base font-medium rounded-full transition-all duration-200 bg-[#1A73E8] text-white shadow-sm hover:bg-[#1967D2] hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-[#1A73E8]/30 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-sm";
+    "inline-flex items-center justify-center w-full sm:w-auto px-10 py-[15px] text-[15px] font-semibold rounded-[10px] transition-all duration-200 bg-[#1A73E8] text-white shadow-[0_2px_8px_rgba(26,115,232,0.28)] hover:bg-[#1967D2] hover:shadow-[0_4px_16px_rgba(26,115,232,0.38)] hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-[#1A73E8]/28 disabled:opacity-55 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-sm";
 
   const fabClass =
     "flex h-12 w-12 items-center justify-center rounded-full bg-[#1A73E8] text-white text-xl leading-none shadow-lg transition-all duration-200 hover:bg-[#1967D2] hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-[#1A73E8]/30";
@@ -400,7 +457,7 @@ export default function ClientOnboarding() {
       type="button"
       onClick={() => setDarkMode(!darkMode)}
       aria-label="Toggle color theme"
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition ${
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition ${
         darkMode
           ? "border-zinc-700 bg-zinc-900 hover:bg-zinc-800"
           : "border-zinc-200 bg-white hover:bg-zinc-50 shadow-sm"
@@ -412,7 +469,7 @@ export default function ClientOnboarding() {
 
   /* ── Chevron SVG ──────────────────── */
   const chevron = (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M5.5 7.5L10 12l4.5-4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -421,13 +478,22 @@ export default function ClientOnboarding() {
   const SectionHeader = ({
     title,
     subtitle,
+    icon,
   }: {
     title: string;
     subtitle: string;
+    icon: React.ReactNode;
   }) => (
-    <div className="mb-8">
-      <h2 className={sectionTitleClass}>{title}</h2>
-      <p className={`mt-1.5 text-sm leading-6 ${helperClass}`}>{subtitle}</p>
+    <div className="mb-10">
+      <div className="flex items-center gap-3.5 mb-2">
+        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
+          darkMode ? "bg-zinc-800" : "bg-[#F1F5F9]"
+        }`}>
+          {icon}
+        </div>
+        <h2 className={sectionTitleClass}>{title}</h2>
+      </div>
+      <p className={`ml-[58px] text-[14px] leading-6 ${helperClass}`}>{subtitle}</p>
     </div>
   );
 
@@ -488,7 +554,7 @@ export default function ClientOnboarding() {
 
               {/* next steps */}
               <div className="mt-10">
-                <p className={`text-xs leading-5 font-semibold uppercase tracking-widest mb-4 ${helperClass}`}>
+                <p className={`text-[11px] leading-5 font-semibold uppercase tracking-widest mb-4 ${helperClass}`}>
                   What happens next
                 </p>
                 <ol className="space-y-3">
@@ -507,7 +573,7 @@ export default function ClientOnboarding() {
 
               {/* submission summary */}
               <div className={`mt-10 rounded-2xl p-6 ${darkMode ? "bg-zinc-800/60" : "bg-zinc-50"}`}>
-                <p className={`text-xs leading-5 font-semibold uppercase tracking-widest mb-4 ${helperClass}`}>
+                <p className={`text-[11px] leading-5 font-semibold uppercase tracking-widest mb-4 ${helperClass}`}>
                   Your submission summary
                 </p>
                 <dl className="space-y-3">
@@ -595,13 +661,13 @@ export default function ClientOnboarding() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-14 md:py-20">
+      <div className="max-w-5xl mx-auto px-6 py-14 md:py-24">
 
         {/* ── Branding header ────────────── */}
-        <div className="flex justify-between items-start gap-4 mb-14">
+        <div className="flex justify-between items-start gap-4 mb-16">
           <div>
-            <p className="text-lg font-semibold tracking-tight">Kartheepan</p>
-            <p className="mt-1 text-sm tracking-wide text-zinc-500">
+            <p className="text-[15px] font-semibold tracking-tight">Kartheepan</p>
+            <p className="mt-1 text-[13px] tracking-wide text-zinc-500">
               UX/UI Designer • Product Design • User Experience
             </p>
           </div>
@@ -609,25 +675,28 @@ export default function ClientOnboarding() {
         </div>
 
         {/* ── Hero ───────────────────────── */}
-        <div className="mb-10 max-w-3xl">
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.05]">
+        <div className="mb-12 max-w-[760px]">
+          <h1 className={`text-[48px] md:text-[68px] font-bold tracking-[-1.5px] leading-[0.97] ${
+            darkMode ? "text-white" : "text-[#0B3558]"
+          }`}>
             Let&apos;s build something meaningful.
           </h1>
-          <p className={`mt-6 text-base md:text-lg leading-7 font-light ${helperClass}`}>
+          <p className={`mt-7 text-[16px] md:text-[17px] leading-[1.75] max-w-[620px] ${
+            darkMode ? "text-zinc-400" : "text-[#4A5568]"
+          }`}>
             Share your goals, vision, and project requirements. This onboarding
             portal helps create a structured discovery process before design begins.
           </p>
 
           {/* required notice */}
-          <p className={`mt-4 text-sm leading-7 ${helperClass}`}>
-            Fields marked with <span className="font-semibold">*</span> are required.
-            Most questions are optional, but the more details you provide, the better
-            we can understand your project.
+          <p className={`mt-5 text-sm leading-6 ${helperClass}`}>
+            Fields marked with <span className="font-semibold text-zinc-700 dark:text-zinc-300">*</span> are required.
+            Most questions are optional — the more detail you share, the better we can understand your project.
           </p>
 
           {/* time estimate */}
-          <div className={`mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium border ${
-            darkMode ? "border-zinc-700 bg-zinc-900 text-zinc-300" : "border-zinc-200 bg-white text-zinc-600"
+          <div className={`mt-5 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-[13px] font-medium border ${
+            darkMode ? "border-zinc-800 bg-[#18181b] text-zinc-400" : "border-zinc-200 bg-white text-zinc-500 shadow-sm"
           }`}>
             <span>⏱</span>
             <span>Takes approximately 5 minutes to complete</span>
@@ -640,7 +709,7 @@ export default function ClientOnboarding() {
           method="POST"
           onSubmit={handleSubmit}
           noValidate
-          className="space-y-10"
+          className="space-y-12"
         >
 
           {/* ══ 1. Personal Information ══ */}
@@ -651,7 +720,13 @@ export default function ClientOnboarding() {
           >
             <SectionHeader
               title="Personal Information"
-              subtitle="Tell us who you are and the best way to reach you."
+              subtitle="Tell me who you are and the best way to contact you."
+              icon={
+                <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="10" cy="7" r="3.5" fill="#1A73E8"/>
+                  <path d="M3 17c0-3.314 3.134-6 7-6s7 2.686 7 6" stroke="#1A73E8" strokeWidth="1.8" strokeLinecap="round"/>
+                </svg>
+              }
             />
             <div className="grid md:grid-cols-2 gap-6">
               <div>
@@ -700,7 +775,15 @@ export default function ClientOnboarding() {
           >
             <SectionHeader
               title="Project Details"
-              subtitle="A quick overview of what you want to build and by when."
+              subtitle="Help me understand what you're building and your timeline."
+              icon={
+                <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 2C10 2 6 6 6 11h8c0-5-4-9-4-9z" fill="#7C3AED"/>
+                  <rect x="7.5" y="11" width="5" height="3" rx="1" fill="#7C3AED"/>
+                  <path d="M7.5 14l-1.5 3M12.5 14l1.5 3" stroke="#7C3AED" strokeWidth="1.6" strokeLinecap="round"/>
+                  <circle cx="10" cy="8.5" r="1.2" fill="white"/>
+                </svg>
+              }
             />
 
             {/* Row 1: Project Name + Project Type */}
@@ -756,7 +839,7 @@ export default function ClientOnboarding() {
             <div className="space-y-5">
               <div>
                 <label htmlFor="project_description" className={labelClass}>Project Description</label>
-                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>Tell us what you&apos;re building.</p>
+                <p className={`text-[13px] leading-5 mb-2 ${helperClass}`}>Tell us what you&apos;re building.</p>
                 <textarea
                   id="project_description" name="project_description" rows={4}
                   className={inputClass}
@@ -766,7 +849,7 @@ export default function ClientOnboarding() {
 
               <div>
                 <label htmlFor="project_goals" className={labelClass}>Project Goals</label>
-                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
+                <p className={`text-[13px] leading-5 mb-2 ${helperClass}`}>
                   What outcome are you hoping to achieve? e.g. Increase sales, Get more signups, Improve usability, Launch MVP
                 </p>
                 <textarea
@@ -786,12 +869,20 @@ export default function ClientOnboarding() {
           >
             <SectionHeader
               title="Target Audience"
-              subtitle="The more specific you are here, the better we can design for your users."
+              subtitle="Tell me who this product is designed for."
+              icon={
+                <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="7.5" cy="7" r="2.8" fill="#10B981"/>
+                  <circle cx="13.5" cy="7" r="2.2" fill="#10B981" fillOpacity="0.6"/>
+                  <path d="M1.5 16.5c0-2.761 2.686-5 6-5s6 2.239 6 5" stroke="#10B981" strokeWidth="1.8" strokeLinecap="round"/>
+                  <path d="M13.5 11.5c1.8.4 3.5 1.9 3.5 4" stroke="#10B981" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.7"/>
+                </svg>
+              }
             />
             <div className="space-y-5">
               <div>
                 <label htmlFor="target_audience" className={labelClass}>Who are your users?</label>
-                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
+                <p className={`text-[13px] leading-5 mb-2 ${helperClass}`}>
                   Be as specific as possible — age, role, context of use, technical ability.
                 </p>
                 <textarea
@@ -803,7 +894,7 @@ export default function ClientOnboarding() {
 
               <div>
                 <label htmlFor="user_problems" className={labelClass}>What problems are they facing?</label>
-                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
+                <p className={`text-[13px] leading-5 mb-2 ${helperClass}`}>
                   Describe the pain points your product will solve.
                 </p>
                 <textarea
@@ -824,13 +915,18 @@ export default function ClientOnboarding() {
             <SectionHeader
               title="Key Features Needed"
               subtitle="Select the features you need. Add anything custom below."
+              icon={
+                <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11 2L4 11h6.5L9 18l7-9h-6.5L11 2z" fill="#F59E0B" stroke="#F59E0B" strokeWidth="0.5" strokeLinejoin="round"/>
+                </svg>
+              }
             />
 
             {/* DESKTOP: grouped 2-col grid with category labels */}
             <div className="hidden md:block space-y-7">
               {FEATURE_GROUPS.map((group) => (
                 <div key={group.title}>
-                  <p className={`text-xs leading-5 font-semibold uppercase tracking-widest mb-3 ${helperClass}`}>
+                  <p className={`text-[11px] leading-5 font-semibold uppercase tracking-widest mb-3 ${helperClass}`}>
                     {group.title}
                   </p>
                   <div className="grid md:grid-cols-2 gap-3">
@@ -901,7 +997,7 @@ export default function ClientOnboarding() {
             {/* Selected chips */}
             {selectedFeatures.length > 0 && (
               <div className="mt-5">
-                <p className={`text-xs leading-5 font-medium mb-2 ${helperClass}`}>
+                <p className={`text-[13px] leading-5 font-medium mb-2 ${helperClass}`}>
                   {selectedFeatures.length} feature{selectedFeatures.length === 1 ? "" : "s"} selected
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -945,7 +1041,16 @@ export default function ClientOnboarding() {
           >
             <SectionHeader
               title="Design Preferences"
-              subtitle="Help us understand the look and feel you are drawn to."
+              subtitle="Share references and visual examples you admire."
+              icon={
+                <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="10" cy="10" r="7.5" stroke="#EC4899" strokeWidth="1.8"/>
+                  <circle cx="7" cy="9" r="1.5" fill="#EC4899"/>
+                  <circle cx="13" cy="9" r="1.5" fill="#EC4899"/>
+                  <circle cx="10" cy="6.5" r="1.5" fill="#F472B6"/>
+                  <path d="M7 13c0-1.657 1.343-3 3-3s3 1.343 3 3" fill="#EC4899"/>
+                </svg>
+              }
             />
 
             <div className="space-y-7">
@@ -954,7 +1059,7 @@ export default function ClientOnboarding() {
                 <label htmlFor="references" className={labelClass}>
                   Apps or Websites You Admire
                 </label>
-                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
+                <p className={`text-[13px] leading-5 mb-2 ${helperClass}`}>
                   Tell us what you like about them — Navigation, Simplicity, Layout, Visual Style, Animations.
                 </p>
                 <textarea
@@ -969,7 +1074,7 @@ export default function ClientOnboarding() {
                 <label htmlFor="reference_links" className={labelClass}>
                   Paste URLs Here
                 </label>
-                <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
+                <p className={`text-[13px] leading-5 mb-2 ${helperClass}`}>
                   Share links to Google Drive, Figma, Dropbox, Behance, Dribbble, Pinterest, or any relevant files.
                 </p>
                 <textarea
@@ -982,25 +1087,57 @@ export default function ClientOnboarding() {
               {/* Visual style chips */}
               <div>
                 <label className={labelClass}>Visual Style</label>
-                <p className={`text-xs leading-5 mb-3 ${helperClass}`}>
+                <p className={`text-[13px] leading-5 mb-3 ${helperClass}`}>
                   Select all that apply. Multiple choices are fine.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {STYLE_CHIPS.map((s) => {
-                    const active = selectedStyles.includes(s);
+                  {STYLE_CHIPS.map((chip) => {
+                    const active = selectedStyles.includes(chip.label);
                     return (
                       <button
-                        key={s} type="button"
-                        onClick={() => toggleStyle(s)}
+                        key={chip.label}
+                        type="button"
+                        onClick={() => toggleStyle(chip.label)}
                         aria-pressed={active}
-                        className={featureChipClass(active)}
+                        style={
+                          active
+                            ? {
+                                background: `linear-gradient(135deg, ${chip.from}, ${chip.to})`,
+                                borderColor: "transparent",
+                                color: "#ffffff",
+                                boxShadow: `0 2px 14px ${chip.glow}`,
+                              }
+                            : {
+                                borderColor: darkMode ? "#3f3f46" : "#e4e4e7",
+                                color: darkMode ? "#d4d4d8" : "#52525b",
+                              }
+                        }
+                        onMouseEnter={(e) => {
+                          if (active) return;
+                          const el = e.currentTarget;
+                          el.style.borderColor = chip.hoverBorder;
+                          el.style.color = darkMode ? "#e4e4e7" : chip.hoverText;
+                          el.style.background = darkMode
+                            ? "rgba(255,255,255,0.06)"
+                            : chip.hoverBg;
+                          el.style.boxShadow = `0 2px 8px ${chip.glow.replace(/[\d.]+\)$/, "0.18)")}`;
+                        }}
+                        onMouseLeave={(e) => {
+                          if (active) return;
+                          const el = e.currentTarget;
+                          el.style.borderColor = darkMode ? "#3f3f46" : "#e4e4e7";
+                          el.style.color = darkMode ? "#d4d4d8" : "#52525b";
+                          el.style.background = "transparent";
+                          el.style.boxShadow = "none";
+                        }}
+                        className={`${chipBase} px-3.5 py-1.5 border bg-transparent transition-all duration-200 hover:scale-[1.02] hover:-translate-y-px`}
                       >
                         {active && (
                           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="shrink-0">
                             <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         )}
-                        {s}
+                        {chip.label}
                       </button>
                     );
                   })}
@@ -1026,13 +1163,20 @@ export default function ClientOnboarding() {
           >
             <SectionHeader
               title="Budget & Communication"
-              subtitle="Set expectations so we can plan the right approach."
+              subtitle="Help me understand your budget and how we should stay in touch."
+              icon={
+                <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="3" width="16" height="11" rx="2.5" fill="#0369A1"/>
+                  <path d="M6 17l4-3 4 3" fill="#0369A1"/>
+                  <text x="10" y="11" textAnchor="middle" fontSize="7" fontWeight="700" fill="white" fontFamily="sans-serif">$</text>
+                </svg>
+              }
             />
 
             {/* Budget */}
             <div className="mb-6">
               <label htmlFor="budget" className={labelClass}>Budget</label>
-              <p className={`text-xs leading-5 mb-2 ${helperClass}`}>
+              <p className={`text-[13px] leading-5 mb-2 ${helperClass}`}>
                 Any range is helpful — we can work with most budgets.
               </p>
               <input
@@ -1044,7 +1188,7 @@ export default function ClientOnboarding() {
             {/* Contact method pills */}
             <div className="mb-6">
               <label className={labelClass}>Preferred Contact Method</label>
-              <p className={`text-xs leading-5 mb-3 ${helperClass}`}>
+              <p className={`text-[13px] leading-5 mb-3 ${helperClass}`}>
                 Select all that work for you.
               </p>
               <div className="flex flex-wrap gap-2">
