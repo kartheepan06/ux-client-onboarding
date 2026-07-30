@@ -668,7 +668,7 @@ export default function ClientOnboarding() {
             width: 8,
             height: 8,
             borderRadius: "50%",
-            background: "rgba(26, 115, 232, 0.8)",
+            background: "rgba(0, 0, 0, 0.75)",
             transform: "translate(-50%, -50%)",
             pointerEvents: "none",
             zIndex: 9999,
@@ -754,12 +754,9 @@ export default function ClientOnboarding() {
 
           {/* time estimate */}
           <div className={`mt-5 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-[13px] font-medium border ${
-            darkMode ? "border-zinc-800 bg-[#18181b] text-zinc-400" : "border-zinc-200 bg-white text-[#3F3F46] shadow-sm"
+            darkMode ? "border-zinc-800 bg-[#18181b] text-zinc-400" : "border-zinc-200 bg-white text-zinc-500 shadow-sm"
           }`}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.4"/>
-              <path d="M7 4v3l2 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <span>⏱</span>
             <span>Takes approximately 5 minutes to complete</span>
           </div>
         </div>
