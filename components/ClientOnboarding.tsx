@@ -135,6 +135,64 @@ const SECTION_IDS = [
   "section-budget",
 ];
 
+/* ── SectionHeader — module-level so hooks are valid ── */
+function SectionHeader({
+  title,
+  subtitle,
+  icon: _icon,
+  illustration,
+  sectionTitleClass,
+  helperClass,
+}: {
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  illustration: React.ReactNode;
+  sectionTitleClass: string;
+  helperClass: string;
+}) {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0, rootMargin: "0px 0px -20px 0px" }
+    );
+    const timer = setTimeout(() => observer.observe(node), 80);
+    return () => { clearTimeout(timer); observer.disconnect(); };
+  }, []);
+
+  return (
+    <div className="mb-10">
+      <div
+        ref={ref}
+        style={{
+          opacity: visible ? 1 : 0,
+          filter: visible ? "blur(0px)" : "blur(6px)",
+          transform: visible
+            ? "translateY(0px)"
+            : "translateY(32px)",
+          transition:
+            "opacity 1.1s ease, filter 1.1s ease, transform 1.1s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+        className="mb-5"
+      >
+        {illustration}
+      </div>
+      <h2 className={sectionTitleClass}>{title}</h2>
+      <p className={`mt-2 text-[14px] leading-6 ${helperClass}`}>{subtitle}</p>
+    </div>
+  );
+}
+
 /* ─── Component ───────────────────────────────────────────────── */
 export default function ClientOnboarding() {
   /* theme */
@@ -175,12 +233,12 @@ export default function ClientOnboarding() {
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
-    const dismissed = sessionStorage.getItem("welcome-dismissed");
+    const dismissed = sessionStorage.getItem("ux-onboarding-welcome-v2");
     if (!dismissed) setShowWelcome(true);
   }, []);
 
   const dismissWelcome = () => {
-    sessionStorage.setItem("welcome-dismissed", "1");
+    sessionStorage.setItem("ux-onboarding-welcome-v2", "1");
     setShowWelcome(false);
   };
 
@@ -522,24 +580,6 @@ export default function ClientOnboarding() {
   );
 
   /* ── Section header helper ────────── */
-  const SectionHeader = ({
-    title,
-    subtitle,
-    icon: _icon,
-    illustration,
-  }: {
-    title: string;
-    subtitle: string;
-    icon: React.ReactNode;
-    illustration: React.ReactNode;
-  }) => (
-    <div className="mb-10">
-      <div className="mb-5">{illustration}</div>
-      <h2 className={sectionTitleClass}>{title}</h2>
-      <p className={`mt-2 text-[14px] leading-6 ${helperClass}`}>{subtitle}</p>
-    </div>
-  );
-
   /* ══════════════════════════════════
      SUCCESS SCREEN
   ══════════════════════════════════ */
@@ -902,6 +942,8 @@ export default function ClientOnboarding() {
                   <path d="M3 17c0-3.314 3.134-6 7-6s7 2.686 7 6" stroke="#1A73E8" strokeWidth="1.8" strokeLinecap="round"/>
                 </svg>
               }
+              sectionTitleClass={sectionTitleClass}
+              helperClass={helperClass}
             />
             <div className="grid md:grid-cols-2 gap-6">
               <div>
@@ -971,6 +1013,8 @@ export default function ClientOnboarding() {
                   <circle cx="10" cy="8.5" r="1.2" fill="white"/>
                 </svg>
               }
+              sectionTitleClass={sectionTitleClass}
+              helperClass={helperClass}
             />
 
             {/* Row 1: Project Name + Project Type */}
@@ -1074,6 +1118,8 @@ export default function ClientOnboarding() {
                   <path d="M13.5 11.5c1.8.4 3.5 1.9 3.5 4" stroke="#10B981" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.7"/>
                 </svg>
               }
+              sectionTitleClass={sectionTitleClass}
+              helperClass={helperClass}
             />
             <div className="space-y-5">
               <div>
@@ -1127,6 +1173,8 @@ export default function ClientOnboarding() {
                   <path d="M11 2L4 11h6.5L9 18l7-9h-6.5L11 2z" fill="#F59E0B" stroke="#F59E0B" strokeWidth="0.5" strokeLinejoin="round"/>
                 </svg>
               }
+              sectionTitleClass={sectionTitleClass}
+              helperClass={helperClass}
             />
 
             {/* DESKTOP: grouped 2-col grid with category labels */}
@@ -1269,6 +1317,8 @@ export default function ClientOnboarding() {
                   <path d="M7 13c0-1.657 1.343-3 3-3s3 1.343 3 3" fill="#EC4899"/>
                 </svg>
               }
+              sectionTitleClass={sectionTitleClass}
+              helperClass={helperClass}
             />
 
             <div className="space-y-7">
@@ -1399,6 +1449,8 @@ export default function ClientOnboarding() {
                   <text x="10" y="11" textAnchor="middle" fontSize="7" fontWeight="700" fill="white" fontFamily="sans-serif">$</text>
                 </svg>
               }
+              sectionTitleClass={sectionTitleClass}
+              helperClass={helperClass}
             />
 
             {/* Budget */}
