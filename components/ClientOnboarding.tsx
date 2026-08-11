@@ -176,7 +176,7 @@ function SectionHeader({
         ref={ref}
         style={{
           opacity: visible ? 1 : 0,
-          filter: visible ? "blur(0px)" : "blur(6px)",
+          filter: visible ? "blur(0px) drop-shadow(0px 8px 24px rgba(0,0,0,0.08))" : "blur(6px) drop-shadow(0px 0px 0px rgba(0,0,0,0))",
           transform: visible
             ? "translateY(0px)"
             : "translateY(32px)",
