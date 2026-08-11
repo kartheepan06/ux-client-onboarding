@@ -171,6 +171,19 @@ export default function ClientOnboarding() {
   const dotRef = useRef({ x: -100, y: -100 });
   const rafRef = useRef<number>(0);
 
+  /* welcome popup — show once per session */
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem("welcome-dismissed");
+    if (!dismissed) setShowWelcome(true);
+  }, []);
+
+  const dismissWelcome = () => {
+    sessionStorage.setItem("welcome-dismissed", "1");
+    setShowWelcome(false);
+  };
+
   /* submitted data for success screen */
   const [submittedData, setSubmittedData] = useState<SubmittedData | null>(null);
 
@@ -657,6 +670,97 @@ export default function ClientOnboarding() {
         ? "bg-[radial-gradient(ellipse_80%_60%_at_0%_0%,_#FECDD3_0%,_#F5F3FF_45%,_#EFF6FF_75%,_#ffffff_100%)]"
         : ""
     }`}>
+      {/* ── Welcome popup ──────────────── */}
+      {showWelcome && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-5"
+          style={{ backdropFilter: "blur(12px)", background: "rgba(0,0,0,0.35)" }}
+          onClick={dismissWelcome}
+          aria-modal="true"
+          role="dialog"
+          aria-label="Welcome"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`relative w-full max-w-md rounded-[24px] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.18)] ${
+              darkMode ? "bg-[#18181B] text-white" : "bg-white text-[#18181B]"
+            }`}
+          >
+            {/* Close */}
+            <button
+              onClick={dismissWelcome}
+              aria-label="Close"
+              className={`absolute top-4 right-4 h-8 w-8 flex items-center justify-center rounded-full text-sm transition ${
+                darkMode ? "text-zinc-400 hover:bg-zinc-800" : "text-[#71717A] hover:bg-zinc-100"
+              }`}
+            >
+              ✕
+            </button>
+
+            {/* Nexivon Labs logo */}
+            <div className="flex justify-center mb-6" aria-hidden="true">
+              <div className={`flex h-16 w-16 items-center justify-center rounded-2xl shadow-[0_4px_16px_rgba(0,145,255,0.25)] ${
+                darkMode ? "bg-zinc-800" : "bg-[#EFF6FF]"
+              }`}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="32" viewBox="0 0 163.968 143.759">
+                  <defs>
+                    <clipPath id="popup-clip">
+                      <rect width="163.968" height="143.759" fill="#0091ff"/>
+                    </clipPath>
+                  </defs>
+                  <g clipPath="url(#popup-clip)">
+                    <path d="M102.669,143.545C125.727,61.9,49.412,46.988,2.18,0-4.508,87.944,76.046,49.215,98.868,94.683,75.466,67.179,24.972,73.737,0,42.9c.033,3.492.174,6.514.447,8.907C8.018,118,73.236,70.621,98.27,102.353c-22.95-16.6-47.6-6.415-79.523-10.865,26.806,37.762,45.181,5.2,79.171,16.75-16.466-1.8-39.2,4.045-57.849,8.16,1.618,1.532,3.146,2.887,4.544,4.029,14.5,11.847,34.259-7.856,53.088-8.742-6.324,2.623-21.636,8.246-39.858,18.3,15.356,10.056,20.26-2.261,40.038-12.456a175.013,175.013,0,0,1-27.795,20.007c9.081,5.319,15.2.849,28.468-15.966,0,0-5.223,9.479-18.449,21.685,6.9,3.911,21.522-16.438,21.548-16.357Z" fill="#0091ff" fillRule="evenodd"/>
+                    <path d="M148.114,118.064h.321a39.386,39.386,0,0,1,2.818-4.694L179.69,76.651h25.237L169.444,118.46l38.429,45.827H181.1l-30.04-38.3a25.39,25.39,0,0,1-2.626-4.583h-.321" transform="translate(-43.904 -22.721)" fill="#0091ff"/>
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+            {/* Heading */}
+            <h2 className="text-[22px] font-bold tracking-tight text-center mb-2">
+              Hey there! 👋
+            </h2>
+            <p className={`text-sm text-center leading-relaxed mb-6 ${darkMode ? "text-zinc-400" : "text-[#71717A]"}`}>
+              I&apos;m Kartheepan, a UX/UI Designer. This short form helps me understand your project before we connect.
+            </p>
+
+            {/* Steps */}
+            <div className={`rounded-xl p-4 mb-6 space-y-3 ${darkMode ? "bg-zinc-800/60" : "bg-[#F8F9FA]"}`}>
+              {[
+                { label: "Fill in your project details", sub: "Takes about 5 minutes" },
+                { label: "Submit your brief", sub: "Everything is kept confidential" },
+                { label: "I'll review and get back to you", sub: "Within 24–48 hours" },
+              ].map(({ label, sub }) => (
+                <div key={label} className="flex items-start gap-3">
+                  {/* Play icon */}
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1A73E8] mt-0.5">
+                    <svg width="8" height="10" viewBox="0 0 8 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M1 1.5L7 5L1 8.5V1.5Z" fill="white" stroke="white" strokeWidth="0.5" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  <div>
+                    <p className={`text-sm font-medium ${darkMode ? "text-zinc-200" : "text-[#18181B]"}`}>{label}</p>
+                    <p className={`text-xs mt-0.5 ${darkMode ? "text-zinc-500" : "text-[#71717A]"}`}>{sub}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <button
+              onClick={dismissWelcome}
+              className="w-full py-3.5 rounded-[10px] bg-[#1A73E8] text-white text-[15px] font-semibold transition-all duration-200 hover:bg-[#1967D2] hover:shadow-[0_4px_16px_rgba(26,115,232,0.38)] hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-[#1A73E8]/30"
+            >
+              Let&apos;s get started →
+            </button>
+
+            <p className={`text-center text-xs mt-3 ${darkMode ? "text-zinc-600" : "text-[#A1A1AA]"}`}>
+              No account needed · Free to submit
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* ── Dot cursor ─────────────────── */}
       {!darkMode && !prefersReducedMotion.current && (
         <div
