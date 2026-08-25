@@ -10,6 +10,7 @@ import {
   type FormEvent,
 } from "react";
 import HelloAnimation from "./HelloAnimation";
+import ThankYouAnimation from "./ThankYouAnimation";
 
 /* ─── Types ───────────────────────────────────────────────────── */
 type FieldErrors = {
@@ -602,35 +603,9 @@ export default function ClientOnboarding() {
 
           <div className="max-w-2xl mx-auto">
             <div className={cardClass}>
-              {/* Companion celebration on success */}
+              {/* Thank-you Lottie animation */}
               <div className="flex flex-col items-center mb-8">
-                <div className="relative h-20 w-20 mb-3" aria-hidden="true">
-                  <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_4px_16px_rgba(26,115,232,0.35)]">
-                    <defs>
-                      <radialGradient id="bodyGradS" cx="42%" cy="35%" r="65%">
-                        <stop offset="0%" stopColor="#6ea8fe"/>
-                        <stop offset="100%" stopColor="#1A73E8"/>
-                      </radialGradient>
-                      <radialGradient id="cheekGradS" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor="#ff9eb5" stopOpacity="0.7"/>
-                        <stop offset="100%" stopColor="#ff9eb5" stopOpacity="0"/>
-                      </radialGradient>
-                    </defs>
-                    <ellipse cx="28" cy="31" rx="19" ry="20" fill="url(#bodyGradS)"/>
-                    <ellipse cx="22" cy="22" rx="7" ry="5" fill="white" fillOpacity="0.18" transform="rotate(-20 22 22)"/>
-                    <ellipse cx="16" cy="34" rx="5" ry="3.5" fill="url(#cheekGradS)"/>
-                    <ellipse cx="40" cy="34" rx="5" ry="3.5" fill="url(#cheekGradS)"/>
-                    <ellipse cx="22" cy="28" rx="4.5" ry="4.5" fill="white"/>
-                    <ellipse cx="22" cy="28" rx="2.2" ry="2.2" fill="#1a1a3a"/>
-                    <ellipse cx="23.2" cy="26.8" rx="0.9" ry="0.9" fill="white" fillOpacity="0.9"/>
-                    <ellipse cx="34" cy="28" rx="4.5" ry="4.5" fill="white"/>
-                    <ellipse cx="34" cy="28" rx="2.2" ry="2.2" fill="#1a1a3a"/>
-                    <ellipse cx="35.2" cy="26.8" rx="0.9" ry="0.9" fill="white" fillOpacity="0.9"/>
-                    <path d="M22 37 Q28 43 34 37" stroke="white" strokeWidth="1.8" strokeLinecap="round" fill="none" strokeOpacity="0.9"/>
-                    <ellipse cx="9" cy="30" rx="3.5" ry="3" fill="#6ea8fe"/>
-                    <ellipse cx="47" cy="30" rx="3.5" ry="3" fill="#6ea8fe"/>
-                  </svg>
-                </div>
+                <ThankYouAnimation width={220} className="mb-3" />
                 <span className="text-sm font-medium text-[#1A73E8]">
                   🎉 Project brief received!
                 </span>
