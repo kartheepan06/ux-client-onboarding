@@ -9,6 +9,7 @@ import {
   type ChangeEvent,
   type FormEvent,
 } from "react";
+import HelloAnimation from "./HelloAnimation";
 
 /* ─── Types ───────────────────────────────────────────────────── */
 type FieldErrors = {
@@ -702,7 +703,7 @@ export default function ClientOnboarding() {
   /* ══════════════════════════════════
      MAIN FORM
   ══════════════════════════════════ */
-  const progressPct = Math.round(((activeSection + 1) / SECTIONS.length) * 100);
+  const progressPct = Math.round((activeSection / (SECTIONS.length - 1)) * 92 + 8);
 
   return (
     <div className={`min-h-screen ${pageClass} ${
@@ -714,7 +715,11 @@ export default function ClientOnboarding() {
       {showWelcome && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-5"
-          style={{ backdropFilter: "blur(12px)", background: "rgba(0,0,0,0.35)" }}
+          style={{
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            background: "rgba(0,0,0,0.35)",
+          }}
           onClick={dismissWelcome}
           aria-modal="true"
           role="dialog"
@@ -878,6 +883,12 @@ export default function ClientOnboarding() {
 
         {/* ── Hero ───────────────────────── */}
         <div className="mb-12 max-w-[760px]">
+
+          {/* Hero hello animation — plays once on viewport entry */}
+          <div className="mb-6">
+            <HelloAnimation width={320} />
+          </div>
+
           <h1 className={`text-[48px] md:text-[68px] font-bold tracking-[-1.5px] leading-[0.97] ${
             darkMode ? "text-white" : "text-[#18181B]"
           }`}>

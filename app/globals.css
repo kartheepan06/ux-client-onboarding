@@ -66,3 +66,32 @@ body {
     transition: none;
   }
 }
+
+/* ── Avatar animations ───────────────────────────────────────── */
+
+@keyframes avatarFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
+}
+
+@keyframes avatarPulse {
+  0%, 100% { transform: scale(1);    opacity: 0.20; }
+  50%       { transform: scale(1.35); opacity: 0.08; }
+}
+
+/* ── Designer illustration animations ───────────────────────── */
+
+@keyframes waveArm {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(-22deg); }
+  40%  { transform: rotate(10deg); }
+  60%  { transform: rotate(-18deg); }
+  80%  { transform: rotate(8deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes steamRise {
+  0%   { opacity: 0;   transform: translateY(0px); }
+  50%  { opacity: 0.8; transform: translateY(-4px); }
+  100% { opacity: 0;   transform: translateY(-8px); }
+}
