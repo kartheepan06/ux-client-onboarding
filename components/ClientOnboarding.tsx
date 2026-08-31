@@ -11,6 +11,7 @@ import {
 } from "react";
 import HelloAnimation from "./HelloAnimation";
 import ThankYouAnimation from "./ThankYouAnimation";
+import { generateClientBriefPDF } from "@/lib/pdfGenerator";
 
 /* ─── Types ───────────────────────────────────────────────────── */
 type FieldErrors = {
@@ -24,6 +25,8 @@ type SubmittedData = {
   projectType: string;
   timeline: string;
   features: string[];
+  pdfUrl: string | null;
+  pdfFilename: string | null;
 };
 
 /* ─── Constants ───────────────────────────────────────────────── */
@@ -456,6 +459,42 @@ export default function ClientOnboarding() {
     setLoading(true);
 
     try {
+      // Generate branded PDF — used both for Formspree attachment
+      // AND for the "Download PDF" button on the success screen
+      let pdfUrl: string | null = null;
+      let pdfFilename: string | null = null;
+
+      try {
+        const { blob, filename } = generateClientBriefPDF({
+          name: (data.get("name") as string) || "",
+          email: (data.get("email") as string) || "",
+          company: (data.get("company") as string) || "",
+          website: (data.get("website") as string) || "",
+          projectName: (data.get("project_name") as string) || "",
+          projectType,
+          timeline: (data.get("timeline") as string) || "",
+          description: (data.get("description") as string) || "",
+          goals: (data.get("goals") as string) || "",
+          users: (data.get("users") as string) || "",
+          painPoints: (data.get("pain_points") as string) || "",
+          features: selectedFeatures,
+          customFeatures: (data.get("custom_features") as string) || "",
+          admiredWebsites: (data.get("admired_websites") as string) || "",
+          referenceUrls: (data.get("reference_urls") as string) || "",
+          visualStyles: selectedStyles,
+          styleNotes: (data.get("style_notes") as string) || "",
+          budget: (data.get("budget") as string) || "",
+          contactMethods: selectedContacts,
+          additionalNotes: (data.get("additional_notes") as string) || "",
+        });
+        data.append("pdf_brief", blob, filename);
+        pdfUrl = URL.createObjectURL(blob);
+        pdfFilename = filename;
+      } catch (pdfErr) {
+        // eslint-disable-next-line no-console
+        console.warn("[PDF] Generation failed, submitting without attachment:", pdfErr);
+      }
+
       const res = await fetch("https://formspree.io/f/mqeoarnb", {
         method: "POST",
         body: data,
@@ -468,6 +507,8 @@ export default function ClientOnboarding() {
           projectType,
           timeline: (data.get("timeline") as string) || "",
           features: selectedFeatures,
+          pdfUrl,
+          pdfFilename,
         });
         setSubmitted(true);
       } else {
@@ -614,6 +655,23 @@ export default function ClientOnboarding() {
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-center">
                 Thanks! We&apos;ve received your project brief.
               </h1>
+
+              {/* Download PDF copy */}
+              {submittedData.pdfUrl && submittedData.pdfFilename && (
+                <div className="mt-6 flex justify-center">
+                  <a
+                    href={submittedData.pdfUrl}
+                    download={submittedData.pdfFilename}
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-[10px] border border-[#E4E4E7] bg-white text-[#18181B] text-[14px] font-medium shadow-sm hover:border-[#1A73E8] hover:text-[#1A73E8] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 dark:bg-[#18181B] dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-[#1A73E8]"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M8 2v9m0 0l-3-3m3 3l3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M2 13h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                    </svg>
+                    <span>Download your brief (PDF)</span>
+                  </a>
+                </div>
+              )}
 
               {/* next steps */}
               <div className="mt-10">
