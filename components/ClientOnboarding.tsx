@@ -17,6 +17,7 @@ import { generateClientBriefPDF } from "@/lib/pdfGenerator";
 type FieldErrors = {
   name?: string;
   email?: string;
+  project_name?: string;
   project_type?: string;
 };
 
@@ -236,6 +237,13 @@ export default function ClientOnboarding() {
 
   /* welcome popup — show once per session */
   const [showWelcome, setShowWelcome] = useState(false);
+
+  /* Scroll to top when success screen renders */
+  useEffect(() => {
+    if (submitted) {
+      window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    }
+  }, [submitted]);
 
   useEffect(() => {
     const dismissed = sessionStorage.getItem("ux-onboarding-welcome-v2");
@@ -460,6 +468,8 @@ export default function ClientOnboarding() {
     if (!email.trim()) nextErrors.email = "* Email is required";
     else if (!EMAIL_PATTERN.test(email.trim()))
       nextErrors.email = "* Please enter a valid email address";
+    if (!(data.get("project_name") as string)?.trim())
+      nextErrors.project_name = "* Please enter a project name";
     if (!projectType) nextErrors.project_type = "* Please select a project type";
 
     if (Object.keys(nextErrors).length > 0) {
@@ -1082,9 +1092,21 @@ export default function ClientOnboarding() {
                 <label htmlFor="project_name" className={labelClass}>Project Name *</label>
                 <input
                   id="project_name" name="project_name" required
-                  className={inputClass}
+                  aria-invalid={fieldErrors.project_name ? true : undefined}
+                  aria-describedby={fieldErrors.project_name ? "project_name-error" : undefined}
+                  onChange={(e) => {
+                    if (e.target.value.trim() && fieldErrors.project_name) {
+                      setFieldErrors((p) => { const n = { ...p }; delete n.project_name; return n; });
+                    }
+                  }}
+                  className={`${inputClass} ${fieldErrors.project_name ? inputErrorBorder : ""}`}
                   placeholder="e.g. Marketing site redesign"
                 />
+                {fieldErrors.project_name && (
+                  <p id="project_name-error" className={errorTextClass}>
+                    {fieldErrors.project_name}
+                  </p>
+                )}
               </div>
 
               <div>
