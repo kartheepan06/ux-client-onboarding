@@ -500,7 +500,9 @@ export default function ClientOnboarding() {
           contactMethods: selectedContacts,
           additionalNotes: (data.get("additional_notes") as string) || "",
         });
-        data.append("pdf_brief", blob, filename);
+        // NOTE: Formspree free plan rejects submissions with file attachments (HTTP 400).
+        // We keep the PDF for the client's download button on the success screen only.
+        // data.append("pdf_brief", blob, filename);
         pdfUrl = URL.createObjectURL(blob);
         pdfFilename = filename;
       } catch (pdfErr) {
