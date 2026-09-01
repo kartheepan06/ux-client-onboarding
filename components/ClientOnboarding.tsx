@@ -751,6 +751,39 @@ export default function ClientOnboarding() {
                   )}
                 </dl>
               </div>
+
+              {/* While you wait — portfolio link */}
+              <div className="mt-10 pt-8 border-t border-[#E5E7EB] dark:border-zinc-800">
+                <p className={`text-[11px] leading-5 font-semibold uppercase tracking-widest mb-3 ${helperClass}`}>
+                  While you wait
+                </p>
+                <a
+                  href="https://www.kartheepanm.info/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`group flex items-center justify-between gap-4 p-5 rounded-[14px] border transition-all duration-200 ${
+                    darkMode
+                      ? "border-zinc-800 bg-[#0d0d0f] hover:border-[#1A73E8] hover:bg-[#1A73E8]/[0.06]"
+                      : "border-[#E5E7EB] bg-white hover:border-[#1A73E8] hover:bg-[#1A73E8]/[0.03] hover:shadow-md"
+                  }`}
+                >
+                  <div>
+                    <p className={`text-[15px] font-semibold ${darkMode ? "text-white" : "text-[#18181B]"}`}>
+                      Explore my recent work
+                    </p>
+                    <p className={`text-[13px] mt-0.5 ${helperClass}`}>
+                      kartheepanm.info
+                    </p>
+                  </div>
+                  <span className={`shrink-0 transition-transform duration-200 group-hover:translate-x-1 ${
+                    darkMode ? "text-zinc-400 group-hover:text-[#6ea8fe]" : "text-[#71717A] group-hover:text-[#1A73E8]"
+                  }`}>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M4 9h10m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
