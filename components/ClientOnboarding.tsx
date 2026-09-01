@@ -1247,11 +1247,11 @@ export default function ClientOnboarding() {
                     <button
                       type="button"
                       onClick={() => toggleGroup(group.items)}
-                      className={`text-[11px] font-medium uppercase tracking-wider transition-colors ${
+                      className={`text-[12px] font-normal transition-colors ${
                         allSelected
                           ? darkMode ? "text-[#6ea8fe] hover:text-white" : "text-[#1A73E8] hover:text-[#0B3558]"
-                          : darkMode ? "text-zinc-400 hover:text-[#6ea8fe]" : "text-[#71717A] hover:text-[#1A73E8]"
-                      }`}
+                          : darkMode ? "text-[#6ea8fe]/70 hover:text-[#6ea8fe]" : "text-[#1A73E8]/80 hover:text-[#1A73E8]"
+                      } hover:underline underline-offset-4`}
                       aria-label={allSelected ? `Clear all ${group.title}` : `Select all ${group.title}`}
                     >
                       {allSelected ? "Clear all" : "Select all"}
@@ -1311,10 +1311,10 @@ export default function ClientOnboarding() {
                       <button
                         type="button"
                         onClick={() => toggleGroup(group.items)}
-                        className={`text-[11px] font-medium uppercase tracking-wider transition-colors ${
+                        className={`text-[12px] font-normal transition-colors hover:underline underline-offset-4 ${
                           allSelected
                             ? darkMode ? "text-[#6ea8fe]" : "text-[#1A73E8]"
-                            : darkMode ? "text-zinc-400" : "text-[#71717A]"
+                            : darkMode ? "text-[#6ea8fe]/70" : "text-[#1A73E8]/80"
                         }`}
                         aria-label={allSelected ? `Clear all ${group.title}` : `Select all ${group.title}`}
                       >
