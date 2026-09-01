@@ -374,6 +374,19 @@ export default function ClientOnboarding() {
       prev.includes(item) ? prev.filter((f) => f !== item) : [...prev, item]
     );
 
+  /** Select-all / clear helper: if every item in the group is selected, clear them all; else select them all. */
+  const toggleGroup = (items: string[]) => {
+    setSelectedFeatures((prev) => {
+      const allSelected = items.every((it) => prev.includes(it));
+      if (allSelected) {
+        return prev.filter((f) => !items.includes(f));
+      }
+      const next = new Set(prev);
+      items.forEach((it) => next.add(it));
+      return Array.from(next);
+    });
+  };
+
   const toggleStyle = (s: string) =>
     setSelectedStyles((prev) =>
       prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
@@ -1223,11 +1236,27 @@ export default function ClientOnboarding() {
 
             {/* DESKTOP: grouped 2-col grid with category labels */}
             <div className="hidden md:block space-y-7">
-              {FEATURE_GROUPS.map((group) => (
+              {FEATURE_GROUPS.map((group) => {
+                const allSelected = group.items.every((it) => selectedFeatures.includes(it));
+                return (
                 <div key={group.title}>
-                  <p className={`text-[11px] leading-5 font-semibold uppercase tracking-widest mb-3 ${helperClass}`}>
-                    {group.title}
-                  </p>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className={`text-[11px] leading-5 font-semibold uppercase tracking-widest ${helperClass}`}>
+                      {group.title}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup(group.items)}
+                      className={`text-[11px] font-medium uppercase tracking-wider transition-colors ${
+                        allSelected
+                          ? darkMode ? "text-[#6ea8fe] hover:text-white" : "text-[#1A73E8] hover:text-[#0B3558]"
+                          : darkMode ? "text-zinc-400 hover:text-[#6ea8fe]" : "text-[#71717A] hover:text-[#1A73E8]"
+                      }`}
+                      aria-label={allSelected ? `Clear all ${group.title}` : `Select all ${group.title}`}
+                    >
+                      {allSelected ? "Clear all" : "Select all"}
+                    </button>
+                  </div>
                   <div className="grid md:grid-cols-2 gap-3">
                     {group.items.map((item) => (
                       <label key={item} className={checkboxLabelClass}>
@@ -1242,7 +1271,8 @@ export default function ClientOnboarding() {
                     ))}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* MOBILE: collapsible accordion */}
@@ -1270,11 +1300,27 @@ export default function ClientOnboarding() {
                   featuresOpen ? "max-h-[3000px] opacity-100 mt-4" : "max-h-0 opacity-0"
                 }`}
               >
-                {FEATURE_GROUPS.map((group) => (
+                {FEATURE_GROUPS.map((group) => {
+                  const allSelected = group.items.every((it) => selectedFeatures.includes(it));
+                  return (
                   <div key={group.title} className="mb-5">
-                    <p className={`mb-2 text-xs font-semibold uppercase tracking-widest ${helperClass}`}>
-                      {group.title}
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className={`text-xs font-semibold uppercase tracking-widest ${helperClass}`}>
+                        {group.title}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup(group.items)}
+                        className={`text-[11px] font-medium uppercase tracking-wider transition-colors ${
+                          allSelected
+                            ? darkMode ? "text-[#6ea8fe]" : "text-[#1A73E8]"
+                            : darkMode ? "text-zinc-400" : "text-[#71717A]"
+                        }`}
+                        aria-label={allSelected ? `Clear all ${group.title}` : `Select all ${group.title}`}
+                      >
+                        {allSelected ? "Clear all" : "Select all"}
+                      </button>
+                    </div>
                     <div className="grid gap-3">
                       {group.items.map((item) => (
                         <label key={item} className={checkboxLabelClass}>
@@ -1289,7 +1335,8 @@ export default function ClientOnboarding() {
                       ))}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
