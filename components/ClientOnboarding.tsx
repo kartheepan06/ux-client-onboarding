@@ -1011,6 +1011,13 @@ export default function ClientOnboarding() {
         {/* ── Branding header ────────────── */}
         <div className="flex justify-between items-start gap-4 mb-16">
           <div>
+            <img
+              src="/logo.png"
+              alt="Kartheepan logo"
+              width={40}
+              height={40}
+              className="mb-2.5 h-[40px] w-auto md:h-[44px]"
+            />
             <p className="text-[24px] md:text-[28px] font-semibold tracking-tight leading-tight">Kartheepan</p>
             <p className="mt-0.5 text-[16px] md:text-[18px] tracking-wide text-zinc-500 leading-tight">
               UX/UI Designer • Product Design • User Experience
