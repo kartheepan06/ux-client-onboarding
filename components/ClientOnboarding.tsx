@@ -1011,8 +1011,8 @@ export default function ClientOnboarding() {
         {/* ── Branding header ────────────── */}
         <div className="flex justify-between items-start gap-4 mb-16">
           <div>
-            <p className="text-[20px] md:text-[22px] font-semibold tracking-tight">Kartheepan</p>
-            <p className="mt-1.5 text-[15px] md:text-[16px] tracking-wide text-zinc-500">
+            <p className="text-[24px] md:text-[28px] font-semibold tracking-tight leading-tight">Kartheepan</p>
+            <p className="mt-0.5 text-[16px] md:text-[18px] tracking-wide text-zinc-500 leading-tight">
               UX/UI Designer • Product Design • User Experience
             </p>
           </div>
