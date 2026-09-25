@@ -11,7 +11,7 @@ import {
 } from "react";
 import HelloAnimation from "./HelloAnimation";
 import ThankYouAnimation from "./ThankYouAnimation";
-import { generateClientBriefPDF } from "@/lib/pdfGenerator";
+import { generateClientBriefPDF, generateWelcomeKitPDF } from "@/lib/pdfGenerator";
 
 /* ─── Types ───────────────────────────────────────────────────── */
 type FieldErrors = {
@@ -28,6 +28,8 @@ type SubmittedData = {
   features: string[];
   pdfUrl: string | null;
   pdfFilename: string | null;
+  welcomeKitUrl: string | null;
+  welcomeKitFilename: string | null;
 };
 
 /* ─── Constants ───────────────────────────────────────────────── */
@@ -51,6 +53,15 @@ const FEATURE_GROUPS: { title: string; items: string[] }[] = [
     items: ["AI Features", "Multi-language", "Dark Mode", "API Integrations"],
   },
 ];
+
+/** Feralui "Blue sky" gradient — applied as page background */
+const SKY_GRADIENT =
+  "linear-gradient(rgba(255,253,250,0.42), rgba(255,253,250,0.42)), " +
+  "radial-gradient(80% 70% at 15% 12%, #E6F2FF, transparent 55%), " +
+  "radial-gradient(80% 70% at 85% 16%, #B3D9FF, transparent 55%), " +
+  "radial-gradient(90% 80% at 24% 88%, #80B3FF, transparent 58%), " +
+  "radial-gradient(100% 85% at 84% 84%, #6699E6, transparent 60%), " +
+  "#f6f3ee";
 
 const ALL_FEATURES = FEATURE_GROUPS.flatMap((g) => g.items);
 
@@ -482,10 +493,11 @@ export default function ClientOnboarding() {
     setLoading(true);
 
     try {
-      // Generate branded PDF — used both for Formspree attachment
-      // AND for the "Download PDF" button on the success screen
+      // Generate branded PDFs — brief + welcome kit
       let pdfUrl: string | null = null;
       let pdfFilename: string | null = null;
+      let welcomeKitUrl: string | null = null;
+      let welcomeKitFilename: string | null = null;
 
       try {
         const { blob, filename } = generateClientBriefPDF({
@@ -517,7 +529,21 @@ export default function ClientOnboarding() {
         pdfFilename = filename;
       } catch (pdfErr) {
         // eslint-disable-next-line no-console
-        console.warn("[PDF] Generation failed, submitting without attachment:", pdfErr);
+        console.warn("[PDF] Brief generation failed:", pdfErr);
+      }
+
+      try {
+        const wk = generateWelcomeKitPDF({
+          name: (data.get("name") as string) || "",
+          email: (data.get("email") as string) || "",
+          projectName: (data.get("project_name") as string) || "",
+          projectType,
+        });
+        welcomeKitUrl = URL.createObjectURL(wk.blob);
+        welcomeKitFilename = wk.filename;
+      } catch (wkErr) {
+        // eslint-disable-next-line no-console
+        console.warn("[PDF] Welcome Kit generation failed:", wkErr);
       }
 
       const res = await fetch("https://formspree.io/f/mqeoarnb", {
@@ -534,6 +560,8 @@ export default function ClientOnboarding() {
           features: selectedFeatures,
           pdfUrl,
           pdfFilename,
+          welcomeKitUrl,
+          welcomeKitFilename,
         });
         setSubmitted(true);
       } else {
@@ -659,11 +687,10 @@ export default function ClientOnboarding() {
     ];
 
     return (
-      <div className={`min-h-screen ${pageClass} ${
-        !darkMode
-          ? "bg-[radial-gradient(ellipse_80%_60%_at_0%_0%,_#FECDD3_0%,_#F5F3FF_45%,_#EFF6FF_75%,_#ffffff_100%)]"
-          : ""
-      }`}>
+      <div
+        className={`min-h-screen ${pageClass}`}
+        style={!darkMode ? { background: SKY_GRADIENT } : undefined}
+      >
         <div className="max-w-5xl mx-auto px-6 py-14 md:py-24">
           <div className="flex justify-end mb-14">{themeToggle}</div>
 
@@ -681,9 +708,9 @@ export default function ClientOnboarding() {
                 Thanks! We&apos;ve received your project brief.
               </h1>
 
-              {/* Download PDF copy */}
+              {/* Download PDFs */}
               {submittedData.pdfUrl && submittedData.pdfFilename && (
-                <div className="mt-6 flex justify-center">
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                   <a
                     href={submittedData.pdfUrl}
                     download={submittedData.pdfFilename}
@@ -695,7 +722,28 @@ export default function ClientOnboarding() {
                     </svg>
                     <span>Download your brief (PDF)</span>
                   </a>
+
+                  {submittedData.welcomeKitUrl && submittedData.welcomeKitFilename && (
+                    <a
+                      href={submittedData.welcomeKitUrl}
+                      download={submittedData.welcomeKitFilename}
+                      className="inline-flex items-center gap-2 px-5 py-3 rounded-[10px] bg-[#1A73E8] text-white text-[14px] font-medium shadow-sm hover:bg-[#1557B0] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 dark:hover:bg-[#4285F4]"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M8 2v9m0 0l-3-3m3 3l3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M2 13h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                      </svg>
+                      <span>Get the Welcome Kit</span>
+                    </a>
+                  )}
                 </div>
+              )}
+
+              {/* Small helper text under buttons */}
+              {submittedData.pdfUrl && (
+                <p className={`mt-3 text-center text-[13px] ${helperClass}`}>
+                  Save your brief for your records. The Welcome Kit shows how we&apos;ll work together.
+                </p>
               )}
 
               {/* next steps */}
@@ -797,11 +845,10 @@ export default function ClientOnboarding() {
   const progressPct = Math.round((activeSection / (SECTIONS.length - 1)) * 92 + 8);
 
   return (
-    <div className={`min-h-screen ${pageClass} ${
-      !darkMode
-        ? "bg-[radial-gradient(ellipse_80%_60%_at_0%_0%,_#FECDD3_0%,_#F5F3FF_45%,_#EFF6FF_75%,_#ffffff_100%)]"
-        : ""
-    }`}>
+    <div
+      className={`min-h-screen ${pageClass}`}
+      style={!darkMode ? { background: SKY_GRADIENT } : undefined}
+    >
       {/* ── Welcome popup ──────────────── */}
       {showWelcome && (
         <div
@@ -964,8 +1011,8 @@ export default function ClientOnboarding() {
         {/* ── Branding header ────────────── */}
         <div className="flex justify-between items-start gap-4 mb-16">
           <div>
-            <p className="text-[15px] font-semibold tracking-tight">Kartheepan</p>
-            <p className="mt-1 text-[13px] tracking-wide text-zinc-500">
+            <p className="text-[20px] md:text-[22px] font-semibold tracking-tight">Kartheepan</p>
+            <p className="mt-1.5 text-[15px] md:text-[16px] tracking-wide text-zinc-500">
               UX/UI Designer • Product Design • User Experience
             </p>
           </div>
