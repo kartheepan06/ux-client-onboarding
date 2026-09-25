@@ -1803,7 +1803,7 @@ export default function ClientOnboarding() {
           {/* Mascot */}
           <div
             className={`
-              relative h-14 w-14 select-none
+              relative h-16 w-16 select-none
               ${prefersReducedMotion.current ? "" : "animate-[companionFloat_4s_ease-in-out_infinite]"}
               ${companionCelebrate && !prefersReducedMotion.current
                 ? "animate-[companionBounce_0.5s_ease-in-out_2]"
