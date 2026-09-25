@@ -968,28 +968,28 @@ export default function ClientOnboarding() {
       <div className={`sticky top-0 z-40 backdrop-blur-md border-b ${
         darkMode ? "bg-zinc-950/85 border-zinc-800" : "bg-white/90 border-[#F3F4F6]"
       }`}>
-        <div className="max-w-5xl mx-auto px-6 py-3">
-          <div className="flex items-center justify-between mb-2">
+        <div className="max-w-5xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2">
-              <span className={`text-xs leading-5 font-semibold ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+              <span className={`text-[14px] leading-5 font-semibold ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
                 Step {activeSection + 1} of {SECTIONS.length}
               </span>
-              <span className={`text-xs leading-5 ${helperClass}`}>
+              <span className={`text-[14px] leading-5 ${helperClass}`}>
                 — {SECTIONS[activeSection]}
               </span>
               {companionCelebrate && (
-                <span className="text-xs font-medium text-[#1A73E8] animate-[fadeSlideUp_0.25s_ease-out]">
+                <span className="text-[14px] font-medium text-[#1A73E8] animate-[fadeSlideUp_0.25s_ease-out]">
                   ✓ {companionMsg}
                 </span>
               )}
             </div>
-            <span className={`text-xs leading-5 font-semibold tabular-nums ${
+            <span className={`text-[14px] leading-5 font-semibold tabular-nums ${
               progressPct === 100 ? "text-[#1A73E8]" : helperClass
             }`}>
               {progressPct}%
             </span>
           </div>
-          <div className={`h-[3px] w-full rounded-full overflow-hidden ${darkMode ? "bg-zinc-800" : "bg-zinc-100"}`}>
+          <div className={`h-[4px] w-full rounded-full overflow-hidden ${darkMode ? "bg-zinc-800" : "bg-zinc-100"}`}>
             <div
               className="h-full rounded-full transition-all duration-700 ease-out"
               style={{
