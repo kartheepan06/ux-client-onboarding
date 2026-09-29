@@ -538,6 +538,8 @@ export default function ClientOnboarding() {
           email: (data.get("email") as string) || "",
           projectName: (data.get("project_name") as string) || "",
           projectType,
+          timeline: (data.get("timeline") as string) || "",
+          features: selectedFeatures,
         });
         welcomeKitUrl = URL.createObjectURL(wk.blob);
         welcomeKitFilename = wk.filename;
